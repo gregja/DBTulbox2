@@ -1,5 +1,4 @@
 <?php
-
 if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET )) {
 	$cnxdb = $this->getDB();
 	$schema = Sanitize::blinderGet ( 'schema');
@@ -65,14 +64,30 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 			echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
 			echo '<thead class="thead-dark">'.PHP_EOL;
 			echo '<tr class="header-row">';
-			echo '<th>Schéma</th><th>Index</th><th>Retrieval</th>';
+			echo '<th>Schéma</th><th>Index</th><th>Keys</th>';
 			echo '</tr>'.PHP_EOL ;
 			echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
 			foreach ( $indexeslist as $dataindex ) {
+				list($cmdx, $sqlx) = DB2Tools::extractIndexKeys($dataindex ['FILE'], $dataindex ['LIBRARY']);
+				$cnxdb->executeSysCommand($cmdx);
+				$indexKeys = $cnxdb->selectBlock($sqlx);
+				$tmpkeys = [];
+				foreach($indexKeys as $dtax) {
+					if (trim($dtax['KEY']) != '') {
+						$sens = '';
+						if ($dtax['SENS'] == 'D') $sens = ' (DESC)';
+						$tmpkeys [] = $dtax['KEY'] . $sens;
+					}
+				}
+				if (count($tmpkeys) > 0) {
+					$keys = implode(', ', $tmpkeys);
+				} else {
+					$keys = 'Index de type "surrogate"';
+				}
 				echo '<tr>';
 				echo '<td>' . $dataindex ['LIBRARY'] . '</td>';
 				echo '<td>' . $dataindex ['FILE'] . '</td>';
-				echo '<td>' . $dataindex ['WHDTM'] . '</td>';
+				echo '<td>' . $keys . '</td>';
 				echo '</tr>';
 			}
 			echo '</tbody>';

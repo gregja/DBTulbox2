@@ -1,5 +1,4 @@
 <?php
-
 if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
     $cnxdb = $this->getDB();
     $schema = Sanitize::blinderGet('schema');
@@ -66,12 +65,14 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
         echo '<th>Statistique DB2</th><th>Valeur renvoyée par DB2</th>';
         echo '</tr>' . PHP_EOL;
         echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
-        foreach ($tablestats as $key => $value) {
-            if (!is_null($value) && trim($value) != '') { 
-                echo '<tr>' . PHP_EOL;
-                echo '<td>&nbsp;' . trim($key) . '&nbsp;</td>' . PHP_EOL;
-                echo '<td>&nbsp;' . trim($value) . '&nbsp;</td>' . PHP_EOL;
-                echo '<tr>' . PHP_EOL;
+        if (is_array($tablestats)) {
+            foreach ($tablestats as $key => $value) {
+                if (!is_null($value) && trim($value) != '') { 
+                    echo '<tr>' . PHP_EOL;
+                    echo '<td>&nbsp;' . trim($key) . '&nbsp;</td>' . PHP_EOL;
+                    echo '<td>&nbsp;' . trim($value) . '&nbsp;</td>' . PHP_EOL;
+                    echo '<tr>' . PHP_EOL;
+                }
             }
         }
         echo '</tbody>'.PHP_EOL;
@@ -83,5 +84,4 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
     }
     echo '<br>'.PHP_EOL ;
     //echo HtmlToolbox::genHtmlLink( 'dbextract_aff_statbib.php?schema=' . $schema , 'Statistiques de la bibliothèque' ) . '<br/>';
-
 }

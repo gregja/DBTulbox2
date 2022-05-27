@@ -16,6 +16,12 @@ interface intDB2Tools {
 
     public static function extractDspDbr($table, $schema, $tmp_table = '', $tmp_schema = '');
     
+    public static function extractIndexKeys($index, $schema, $tmp_table = '', $tmp_schema = ''); 
+
+    public static function findTableFromSsystemName();
+
+    public static function checkIndexFromSystemName();
+
     public static function parseIbmiObjectsFromLib($tmp_table, $credat_comp = true, $typ_object = '', $typ_attrib = '');
 
     public static function compareStrings($chaine1, $chaine2, $troncat = false);
@@ -272,8 +278,28 @@ BLOC_SQL;
         }
         $table = trim($table);
         $schema = trim($schema);
-        $cmd = 'DSPFD FILE(' . $schema . '/' . $table . ') TYPE(*MBRLIST) OUTPUT(*OUTFILE) OUTFILE(' . $tmp_schema . '/' . $tmp_table . ')';
+        $cmd = 'DSPFD FILE(' . $schema . '/' . $table . ') TYPE(*MBRLIST) OUTPUT(*OUTFILE) OUTFILE(' . 
+            $tmp_schema . '/' . $tmp_table . ')';
         $sql = 'SELECT MLFATR, MLSYSN, MLASP, MLNOMB, MLNAME, MLNRCD, MLNDTR, MLCHGC, MLCHGD, MLCHGT, MLUCEN, MLUDAT, MLUCNT FROM ';
+        $sql .= $tmp_schema . '{SEPARATOR}' . $tmp_table . '';
+        return array($cmd, $sql);
+    }
+
+    public static function extractIndexKeys($index, $schema, $tmp_table = '', $tmp_schema = '') {
+        $tmp_table = trim($tmp_table);
+        if ($tmp_table == '') {
+            $tmp_table = 'TMPINDEX';
+        }
+        $tmp_schema = trim($tmp_schema);
+        if ($tmp_schema == '') {
+            $tmp_schema = 'QTEMP';
+        }
+        $index = trim($index);
+        $schema = trim($schema);
+        $cmd = 'DSPFD FILE(' . $schema . '/' . $index . ') TYPE(*ACCPTH) OUTPUT(*OUTFILE) OUTFILE(' .
+            $tmp_schema . '/' . $tmp_table . ')';
+        $cmd .= ' FILEATR(*ALL) OUTMBR(*FIRST *REPLACE)';
+        $sql = 'SELECT APKEYF AS KEY, APKSEQ AS SENS FROM ';
         $sql .= $tmp_schema . '{SEPARATOR}' . $tmp_table . '';
         return array($cmd, $sql);
     }
@@ -466,6 +492,28 @@ WHERE {$from_table}
        AND C.FIELD = k.COLUMN_NAME)
 BLOC_SQL;
         }
+        return $sql;
+    }
+
+    public static function findTableFromSsystemName() {
+        $bib_sys = self::BIB_SYS ;
+        $sql = <<<BLOC_SQL
+SELECT A.TABLE_SCHEMA, A.TABLE_NAME,  
+  A.TABLE_OWNER, A.TABLE_TYPE, A.COLUMN_COUNT, A.ROW_LENGTH, 
+  ifnull(A.TABLE_TEXT, '') as TABLE_TEXT              
+FROM {$bib_sys}{SEPARATOR}SYSTABLES A 
+WHERE A.SYSTEM_TABLE_SCHEMA = ? AND A.SYSTEM_TABLE_NAME = ?
+BLOC_SQL;
+        return $sql;
+    }
+
+    public static function checkIndexFromSystemName() {
+        $bib_sys = self::BIB_SYS ;
+        $sql = <<<BLOC_SQL
+SELECT COUNT(*) AS FOUND           
+FROM {$bib_sys}{SEPARATOR}SYSINDEXES A 
+WHERE A.SYSTEM_INDEX_SCHEMA = ? AND A.SYSTEM_INDEX_NAME = ?
+BLOC_SQL;
         return $sql;
     }
 

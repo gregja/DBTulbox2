@@ -955,8 +955,12 @@ BLOC_TMP_MQT;
         ) ;
 
         list($routine_schema, $routine_name) = DB2Tools::procGenerateSQL() ;
-        return $db->callProcedure ($routine_name, $routine_schema, $parms, true );
-
+        try {
+            return $db->callProcedure ($routine_name, $routine_schema, $parms, true );
+        } catch (Exception $e) {
+			error_log($e->getMessage());
+            return [];
+		}
     }
         
 }

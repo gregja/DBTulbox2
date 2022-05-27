@@ -1,5 +1,4 @@
 <?php
-
 if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET )) {
 	$cnxdb = $this->getDB();
 	$schema = Sanitize::blinderGet('schema') ;
@@ -33,7 +32,16 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 				echo '<legend><h6>Description de l\'index : '.$schema.'/'.$table . '</h6></legend>';
 				$sql_dep = DB2Tools::extractDependanceInverse();
 				$data_dep = $cnxdb->selectOne($sql_dep, array ($system_schema, $system_table ) ) ;
-				echo 'Table sous-jacente : ' . $data_dep['DBFLIB'].'/'.$data_dep['DBFFIL'] . '<br/>';		
+				echo 'Table sous-jacente : ' . trim($data_dep['DBFLIB']).'/'.$data_dep['DBFFIL'] ;
+				
+				$sql_inv = DB2Tools::findTableFromSsystemName();
+				$data_inv = $cnxdb->selectOne($sql_inv, array (trim($data_dep['DBFLIB']), trim($data_dep['DBFFIL']) ) ) ;
+				if ($data_inv) {
+					echo ' => Nom long : '. trim($data_inv['TABLE_SCHEMA']).'/'.$data_inv['TABLE_NAME'];
+				} else {
+					echo 'merde';
+				}
+				echo '<br>'.PHP_EOL;
 
 				$sql_index = DB2Tools::extractSysindexkeys (true, 'NO');
 				$datacols = $cnxdb->selectBlock ( $sql_index, array ($schema, $table) );
@@ -41,14 +49,14 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 				foreach ( $datacols as $datacol ) {
 					$colonne = $datacol ['COLUMN_NAME'];
 					if ($datacol ['ORDERING'] == 'D') {
-						$colonne .= ' ( D ) ';
+						$colonne .= ' ( DESC ) ';
 					}
 					$colons [] = $colonne;
 				}
 				if (count($colons)>0) {
 					echo 'Clés de l\'index : ' . implode ( ', ', $colons ). '<br/>';
 				} else {
-					echo 'Clés de l\'index : données indisponibles pour index de type DDS';
+					echo 'Clés de l\'index : néant (index de type "surrogate")';
 				}
 				
 			}	

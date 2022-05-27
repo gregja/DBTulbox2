@@ -24,9 +24,10 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="<?php echo $this->make_route('dbTablesExtract'); ?>">Tables, Fichiers et Vues</a>
-                    <a class="dropdown-item" href="#">Procédures stockées (à implémenter)</a>
-                    <a class="dropdown-item" href="<?php echo $this->make_route('dbCompSimple'); ?>">Comparaison BD simplifiée</a>
-                <!--    <a class="dropdown-item" href="#">Comparaison BD détaillée (à implémenter)</a> -->
+                    <a class="dropdown-item" href="<?php echo $this->make_route('dbColumnSearch'); ?>">Recherche sur colonnes</a>
+                    <a class="dropdown-item" href="<?php echo $this->make_route('dbRoutinesExtract'); ?>">Procédures stockées et fonctions</a>
+                <!--    <a class="dropdown-item" href="<XXXphp echo $this->make_route('dbCompSimple'); ?>">Comparaison BD simplifiée (à finaliser)</a> -->
+                <!--    <a class="dropdown-item" href="#">Comparaison BD détaillée (à finaliser)</a> -->
                     </div>
                 </li>
                 <li class="nav-item dropdown">

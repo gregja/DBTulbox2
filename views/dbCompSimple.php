@@ -1,14 +1,9 @@
 <?php
 // TODO : en cours de modification 
 $currentScript = 'dbCompSimple';
-/*
-require_once ('../inc/config.php');
-require_once ('../inc/configdb.php');
-require_once ('../inc/configdb02.php');
-require_once ('../inc/configdb03.php');
-*/
+
 // temporairement, je duplique la connexion 1 vers les 2 autres
-// TODO : étendre Bones pour transmettre plusieurs connecteurs
+// TODO : à revoir pour intégrer plusieurs connecteurs
 $cnx_db01 = $this->getDB();
 $cnx_db02 = $this->getDB();
 $cnx_db03 = $this->getDB();

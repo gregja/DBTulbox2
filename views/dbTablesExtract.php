@@ -1,5 +1,5 @@
 <?php
-$currentScript = 'dbTablesExtract';
+$currentScript = 'dbTablesExtract';  
 
 // récupération des paramètres de $_GET
 $fields = array ('nom_base', 'nom_table', 'type_objet', 'respect_casse', 'table_used_ref' );
@@ -128,7 +128,7 @@ if ($this->get_method() == 'GET' && array_key_exists('nom_table', $_GET)) {
 					
 					ob_end_flush ();
 					exit ();
-							}
+				}
 							
 				if (array_key_exists ( 'crud_export_sql', $_GET )) {
 					ob_clean ();
@@ -160,7 +160,7 @@ if ($this->get_method() == 'GET' && array_key_exists('nom_table', $_GET)) {
 					if (array_key_exists ( 'table_used_src', $params ) && $params ['table_used_src'] == 'ON') {
 						GenProcDb2::liste_DeleteTablesNotUsed ( $datas );
 					}
-					
+					$lastRowNumber = 0;
 					echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
 					echo '<thead class="thead-dark">'.PHP_EOL;
 					echo '<tr><th>Schéma</th><th>Table (sqlname)</th><th>Table (sysname)</th>'.
@@ -171,7 +171,6 @@ if ($this->get_method() == 'GET' && array_key_exists('nom_table', $_GET)) {
 					echo '</tr>'.PHP_EOL;
 					echo '</thead>'.PHP_EOL;
 					echo '<tbody>'.PHP_EOL;
-					$lastRowNumber = 0;
 					foreach ( $datas as $data ) {
 						if (is_null($data ['TABLE_TEXT'] ) || trim ( $data ['TABLE_TEXT'] ) == '') {
 							$data ['TABLE_TEXT'] = '&nbsp;';
@@ -190,7 +189,6 @@ if ($this->get_method() == 'GET' && array_key_exists('nom_table', $_GET)) {
 							echo '<td>' . $data ['SPECIFIC_NAME'] . '</td>'.PHP_EOL;
 						}
 						echo '</tr>'.PHP_EOL;
-						$lastRowNumber ++;
 					}
 					echo '</tbody>'.PHP_EOL;
 					echo '</table>'.PHP_EOL;
