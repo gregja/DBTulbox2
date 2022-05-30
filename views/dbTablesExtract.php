@@ -1,5 +1,5 @@
 <?php
-$currentScript = 'dbTablesExtract';  
+$currentScript = 'dbTablesExtract';
 
 // récupération des paramètres de $_GET
 $fields = array ('nom_base', 'nom_table', 'type_objet', 'respect_casse', 'table_used_ref' );
@@ -14,35 +14,42 @@ $params ['offset'] = $offset;
 ?>
 <fieldset><legend>Structure des tables et vues DB2</legend>
 <form id="extraction" name="extraction" method="get" action="">
-<p><label for="nom_base">Saisissez une bibliothèque (saisie facultative) :</label>
-<input type="text" name="nom_base" id="nom_base"
-	value="<?php echo $params['nom_base']; ?>"
-	size="20" />
-<img src="images/search.gif" id="nom_base_icon"  onclick="$('#nom_base').focus();" alt="search" />
-<img src="images/clear_left.png" id="nom_base_clear" border="0" onclick="$('#nom_base').val('');" alt="clear" />
-</p>	
-<p><label for="nom_table">Saisissez une table SQL (nom long ou court, saisie facultative) :</label>
-<input type="text" name="nom_table" id="nom_table"
-	value="<?php echo $params['nom_table']; ?>"
-	size="20" />
-<img src="images/clear_left.png" id="nom_table_clear" border="0" onclick="$('#nom_table').val('');" alt="clear" />	
-</p>
-<p><label for="type_objet">Types d'objets :</label><?php GenForm::input_select('type_objet', DB2Tools::getTypeObjetsDb2(), $params['type_objet']) ;?></p>	
-<!--<p><label for="varchar_only">Varchar seulement :</label> <input
-	type="checkbox" name="varchar_only" id="varchar_only" value="ON"
-	<?php
-	//echo $params ['varchar_only'] == 'ON' ? ' checked="checked" ' : '';
-	?> /></p> -->
-<p><label for="respect_casse">Respecter la casse :</label> <input
-	type="checkbox" name="respect_casse" id="respect_casse" value="ON"
+<div class="form-group row">
+	<label for="nom_base" class="col-sm-4 col-form-label">Saisissez une bibliothèque (saisie facultative) :</label>
+	<div class="col-sm-3">
+		<input type="text" name="nom_base" id="nom_base" class="form-control" size="20"
+		value="<?php echo $params['nom_base']; ?>"/>
+	</div>
+	<div class="col-sm-3">
+	<!--	<img src="images/search.gif" id="nom_base_icon"  onclick="$('#nom_base').focus();" alt="search" /> -->
+		<img src="images/clear_left.png" id="nom_base_clear" border="0" onclick="$('#nom_base').val('');" alt="clear" />
+	</div>
+</div>
+<div class="form-group row">
+<label for="nom_table" class="col-sm-4 col-form-label">Saisissez une table SQL (saisie facultative) (*):</label>
+	<div class="col-sm-3">
+	<input type="text" name="nom_table" id="nom_table" class="form-control" size="20" 
+	value="<?php echo $params['nom_table']; ?>" />
+	</div>
+	<div class="col-sm-3">
+		<img src="images/clear_left.png" id="nom_table_clear" border="0" onclick="$('#nom_table').val('');" alt="clear" />	
+	</div>
+</div>
+<div class="form-group row">
+	<label for="type_objet" class="col-sm-4 col-form-label">Types d'objets </label>
+	<div class="col-sm-3">
+		<?php echo GenForm::inputSelect('type_objet', DB2Tools::getTypeObjetsDb2(), $params['type_objet']) ;?>
+	</div>
+</div>	
+<div class="custom-control custom-checkbox">
+	<input type="checkbox" name="respect_casse" id="respect_casse" value="ON" class="custom-control-input"
 	<?php
 	echo $params ['respect_casse'] == 'ON' ? ' checked="checked" ' : '';
-	?> /></p>
-<!--<p><label for="table_used_ref">Tables utilisées uniquement (références croisées) :</label> 
-<input type="checkbox" name="table_used_ref" id="table_used_ref" value="ON"
-<?php
-	// echo array_key_exists ( 'table_used_ref', $params ) && $params ['table_used_ref'] == 'ON' ? ' checked="checked" ' : '';
-	?> /></p><br/> -->
+	?> />
+	<label class="custom-control-label col-sm-6" for="respect_casse">Respecter la casse</label> 
+</div><br>
+<p><h6><small>(*) : La recherche de table se fait à la fois sur nom long et sur nom court. 
+	Il est possible de suffixer la saisie avec un %, ce qui déclenche une recherche de type "contient".</small></h6></p>
 <input type="submit" value="valider" name="crud_valid" id="crud_valid" class="btn btn-primary" /> 
 <!--
 <input type="submit" value="export_csv" name="crud_export_csv" id="crud_export_csv" class="btn btn-secondary"/>

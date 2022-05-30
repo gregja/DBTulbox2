@@ -1,5 +1,4 @@
 <?php
-
 interface intDB2Tools {
 
     public static function convertirCaracteresAccentues($chaine);
@@ -900,7 +899,7 @@ BLOC_SQL;
         $nom_table = trim($nom_table);
 
         if ($nom_colonne != '') {
-            $wheres [] = 'A.COLUMN_NAME = ?';
+            $wheres [] = '(A.COLUMN_NAME LIKE ? OR A.SYSTEM_COLUMN_NAME LIKE ?)';
         }
 
         if ($nom_schema != '') {

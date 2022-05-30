@@ -20,13 +20,13 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
-                    Structures DB2
+                    Structures DB2 
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="<?php echo $this->make_route('dbTablesExtract'); ?>">Tables, Fichiers et Vues</a>
                     <a class="dropdown-item" href="<?php echo $this->make_route('dbColumnSearch'); ?>">Recherche sur colonnes</a>
                     <a class="dropdown-item" href="<?php echo $this->make_route('dbRoutinesExtract'); ?>">Procédures stockées et fonctions</a>
-                <!--    <a class="dropdown-item" href="<XXXphp echo $this->make_route('dbCompSimple'); ?>">Comparaison BD simplifiée (à finaliser)</a> -->
+                <!--    <a class="dropdown-item" href="<XXphp echo $this->make_route('dbCompSimple'); ?>">Comparaison BD simplifiée (à finaliser)</a> -->
                 <!--    <a class="dropdown-item" href="#">Comparaison BD détaillée (à finaliser)</a> -->
                     </div>
                 </li>

@@ -1,18 +1,18 @@
 <?php
 // TODO : en cours de modification 
-$currentScript = 'dbCompSimple';
+$currentScript = 'dbCompSimple'; 
 
 // temporairement, je duplique la connexion 1 vers les 2 autres
 // TODO : à revoir pour intégrer plusieurs connecteurs
 $cnx_db01 = $this->getDB();
-$cnx_db02 = $this->getDB();
-$cnx_db03 = $this->getDB();
+$cnx_db02 = $cnx_db01;
+$cnx_db03 = $cnx_db01;
 
-$bib_a_analyser1 = Sanitize::blinderPost('bib_a_analyser1', '', 'strtoupper');
-$bib_a_analyser2 = Sanitize::blinderPost('bib_a_analyser2', '', 'strtoupper');
-$serveur1 = Sanitize::blinderPost('serveur1', '', 'strtoupper');
-$serveur2 = Sanitize::blinderPost('serveur2', '', 'strtoupper');
-$table_used_ref = Sanitize::blinderPost('table_used_ref', '', 'strtoupper');
+$bib_a_analyser1 = Sanitize::blinderGet('bib_a_analyser1', '', 'strtoupper');
+$bib_a_analyser2 = Sanitize::blinderGet('bib_a_analyser2', '', 'strtoupper');
+$serveur1 = Sanitize::blinderGet('serveur1', '', 'strtoupper');
+$serveur2 = Sanitize::blinderGet('serveur2', '', 'strtoupper');
+$table_used_ref = Sanitize::blinderGet('table_used_ref', '', 'strtoupper');
 
 $anomalies = array();
 if (count($_GET) > 0) {
@@ -45,19 +45,16 @@ if ($serveur1 == '' && $serveur2 == '') {
         que sur les noms de tables, sans chercher à comparer la structure des tables concordantes.<br>
     </p>
     <form id="extraction" name="extraction" method="get" action="">
-        <p><label for="bib_a_analyser1">Saisissez la bibliothèque du serveur 1
-                (obligatoire) :</label> <input type="text" name="bib_a_analyser1" id="bib_a_analyser1" size="20"
-                                           value="<?php echo $bib_a_analyser1; ?>" required />
-            <img src="images/clear_left.png" id="bib_a_analyser1_clear" border="0" onclick="$('#bib_a_analyser1').val('');" alt="clear" />	
+        <p><label for="bib_a_analyser1">Saisissez la bibliothèque du serveur 1 (obligatoire) :</label> 
+            <input type="text" name="bib_a_analyser1" id="bib_a_analyser1" size="20"
+                value="<?php echo $bib_a_analyser1; ?>" required />
+            <img src="images/clear_left.png" id="bib_a_analyser1_clear" onclick="$('#bib_a_analyser1').val('');" alt="clear" />	
         </p>
-        <p><label for="bib_a_analyser2">Saisissez la bibliothèque du serveur 2
-                (obligatoire) :</label> <input type="text" name="bib_a_analyser2" id="bib_a_analyser2" size="20"
-                                           value="<?php echo $bib_a_analyser2; ?>" required />
-            <img src="images/clear_left.png" id="bib_a_analyser2_clear" border="0" onclick="$('#bib_a_analyser2').val('');" alt="clear"/>	
+        <p><label for="bib_a_analyser2">Saisissez la bibliothèque du serveur 2 (obligatoire) :</label> 
+            <input type="text" name="bib_a_analyser2" id="bib_a_analyser2" size="20"
+                value="<?php echo $bib_a_analyser2; ?>" required />
+            <img src="images/clear_left.png" id="bib_a_analyser2_clear" onclick="$('#bib_a_analyser2').val('');" alt="clear"/>	
         </p>
-    <!--    <p><label for="table_used_ref">Sélectionner uniquement les objets DB2 utilisés dans les procédures stockées :</label> 
-            <input type="checkbox" name="table_used_ref" id="table_used_ref" value="ON" <?php echo $table_used_ref == 'ON' ? ' checked="checked" ' : ''; ?> />
-        </p> -->
         <fieldset><legend>Serveur 1</legend> 
             <label for="serveur1-test"><input id="serveur1-test" name="serveur1" value="<?php echo TYPE_ENVIR_APP03; ?>" type="radio" <?php echo $serveur1 == TYPE_ENVIR_APP03 ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP03; ?></label>
             <label for="serveur1-preprod"><input id="serveur1-preprod" name="serveur1" value="<?php echo TYPE_ENVIR_APP02; ?>" type="radio" <?php echo $serveur1 == TYPE_ENVIR_APP02 ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP02; ?></label>
@@ -86,7 +83,7 @@ if ($bib_a_analyser1 != '' && count($anomalies) == 0) {
         $ref_croisee = false;
     }
     $sql = DB2Tools::extractDb2ObjectsFromLib(true, false, $ref_croisee);
-
+error_log($sql);
     $sql_count = 'with tmp as ('.$sql.') select count(*) as comptage from tmp' ;
 
     if ($serveur1 == TYPE_ENVIR_APP) {

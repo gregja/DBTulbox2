@@ -1,5 +1,5 @@
 <?php
-$currentScript = 'dbRoutinesExtract';
+$currentScript = 'dbRoutinesExtract'; 
 
 // récupération des paramètres du $_GET si existent, sinon récupération des paramètres de $_GET
 $fields = array ('nom_base', 'nom_routine', 'type_objet', 'table_used_ref', 'table_used_src' );
@@ -15,38 +15,50 @@ $params ['offset'] = $offset;
 ?>
 <fieldset><legend>Liste des routines DB2 (procédures stockées et fonctions)</legend>
 <form id="extraction" name="extraction" method="get" action="" >
-<p><label for="nom_base">Saisissez une bibliothèque (facultatif) :</label>
-<input type="text" name="nom_base" id="nom_base"
-	value="<?php
-	echo array_key_exists ( 'nom_base', $params ) ? $params ['nom_base'] : '';
-	?>"
-	size="20" />
-<img src="images/search.gif" id="nom_base_icon" border="0" onclick="$('#nom_base').focus();return false;" alt="search" />
-<img src="images/clear_left.png" id="nom_base_clear" border="0" onclick="$('#nom_base').val('');return false;" alt="clear" />
-</p>	
-<p><label for="nom_routine">Saisissez une routine (facultatif) :</label>
-<input type="text" name="nom_routine" id="nom_routine"
-	value="<?php
-	echo array_key_exists ( 'nom_routine', $params ) ? $params ['nom_routine'] : '';
-	?>"
-	size="20" />
-<img src="images/clear_left.png" id="nom_routine_clear" border="0" onclick="$('#nom_routine').val('');return false;" alt="clear" />	
-</p>
+<div class="form-group row">
+	<label for="nom_base" class="col-sm-4 col-form-label">Saisissez une bibliothèque (facultatif) :</label>
+    <div class="col-sm-3">
+		<input type="text" name="nom_base" id="nom_base" class="form-control" size="20"
+		value="<?php echo array_key_exists ( 'nom_base', $params ) ? $params ['nom_base'] : ''; ?>"/>
+    </div>
+    <div class="col-sm-3">
+	<!--	<img src="images/search.gif" id="nom_base_icon" onclick="$('#nom_base').focus();return false;" alt="search" /> -->
+		<img src="images/clear_left.png" id="nom_base_clear" onclick="$('#nom_base').val('');return false;" alt="clear" />
+	</div>
+  </div>	
+<div class="form-group row">
+	<label for="nom_routine" class="col-sm-4 col-form-label">Saisissez une routine (facultatif) :</label>
+	<div class="col-sm-3">
+	<input type="text" name="nom_routine" id="nom_routine" class="form-control" size="20" 
+	value="<?php echo array_key_exists ( 'nom_routine', $params ) ? $params ['nom_routine'] : ''; ?>"/>
+	</div>
+	<div class="col-sm-3">
+		<img src="images/clear_left.png" id="nom_routine_clear"  onclick="$('#nom_routine').val('');return false;" alt="clear" />	
+	</div>
+</div>
 <?php 
+	$blocked_option = false;
+	if ($blocked_option) {  // fonctions mises en sommeil temporairement TODO : à réactiver après une phase de test
 	// fonctionnalité expérimentale accessible uniquement en mode "local" (inutile en production)
-	if (!Misc::isIBMiPlatform()) {
-	?><p><label for="table_used_ref">Tables utilisées uniquement (références croisées) :</label> 
-<input type="checkbox" name="table_used_ref" id="table_used_ref" value="ON"
+	//if (!Misc::isIBMiPlatform()) {
+	?>
+	<div class="custom-control custom-checkbox">
+		<input type="checkbox" name="table_used_ref" id="table_used_ref" value="ON" class="custom-control-input"
 	<?php
 	echo array_key_exists ( 'table_used_ref', $params ) && $params ['table_used_ref'] == 'ON' ? ' checked="checked" ' : '';
-	?> /></p><p><label for="table_used_src">Tables utilisées uniquement (recherche multi-sources) :</label> 
-<input type="checkbox" name="table_used_src" id="table_used_src" value="ON"
+	?> />
+		<label for="table_used_ref" class="custom-control-label col-sm-6">Tables utilisées uniquement (références croisées)</label> 
+	</div>
+	<div class="custom-control custom-checkbox">
+		<input type="checkbox" name="table_used_src" id="table_used_src" value="ON" class="custom-control-input"
 	<?php
 	echo array_key_exists ( 'table_used_src', $params ) && $params ['table_used_src'] == 'ON' ? ' checked="checked" ' : '';
-	?> /></p><?php 
+	?> />
+		<label for="table_used_src" class="custom-control-label col-sm-6" >Tables utilisées uniquement (recherche multi-sources)</label> 
+	</div><br><?php 
 	}
 	?>
-<input type="submit" value="valider" name="crud_valid" id="crud_valid" /> 
+<input type="submit" value="valider" name="crud_valid" id="crud_valid" class="btn btn-primary"  /> 
 <!-- <input type="submit" value="export_csv" name="crud_export_csv" id="crud_export_csv" /> -->
 </form>
 </fieldset>
