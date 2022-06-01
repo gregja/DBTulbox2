@@ -3,8 +3,8 @@ if (! isset ( $cnxdb )) {
 	
 	$options = array ();
 	$options['i5_naming'] = true ;
-	$options['i5_libl'] = $liste_bibs[TYPE_ENVIR_APP] ;
-	$options['DB2_ATTR_CASE'] = 'UPPER'  ;	
+	$options['i5_libl'] = $liste_servers[0]['lib'];
+	$options['DB2_ATTR_CASE'] = 'UPPER';	
     $options['CCSID'] = '1208';
 	
 	/*
@@ -32,3 +32,20 @@ if (! isset ( $cnxdb )) {
 	}
 	
 }
+
+// Ouverture des connexions aux serveurs secondaires si définis
+for ($i=0, $imax=count($liste_servers); $i<$imax; $i++) {
+	$tmpsrv = $liste_servers[$i];
+	if ($tmpsrv['server'] == TYPE_ENVIR_APP) {
+		$liste_servers[$i]['cnx'] = $cnxdb;
+	} else {
+		$options['i5_libl'] = $tmpsrv['lib'];
+		if (Misc::isIBMiPlatform ()) {		
+			$liste_servers[$i]['cnx'] = new DB2_IBMi_DBInstance($tmpsrv['server'], $tmpsrv['usr'], $tmpsrv['pwd'], $options ) ;	
+		} else {
+			$liste_servers[$i]['cnx'] = new PDO_DB2IBMi_DBInstance($tmpsrv['server'], $tmpsrv['usr'], $tmpsrv['pwd'], $options ) ;
+		}
+	}
+}
+
+

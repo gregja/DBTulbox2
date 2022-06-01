@@ -1,11 +1,5 @@
 <?php
-/**
- * Returns JS code to select automatically the first tab of the page
- * @return string JS code
- */
-function selectFirstTab() {
-    return "document.querySelector(\"[data-tab='1']\").childNodes[0].click();";
-}
+require 'lib/jsFunctions.php';
 
 microFmw::get('/', function($app) {
     $app->render('home');
@@ -29,20 +23,14 @@ microFmw::get('/dbTableDisplay', function($app) {
     $app->set('schema', $app->form('schema'));
     $app->set('table', $app->form('table'));
     $app->render('dbTableDisplay');
-}, $cnxdb, selectFirstTab());
+}, $cnxdb, [selectFirstTab()]);
 
 microFmw::get('/dbRoutineDisplay', function($app) {
     $app->set('schema', $app->form('schema'));
     $app->set('routine', $app->form('routine'));
     $app->render('dbRoutineDisplay');
-}, $cnxdb, selectFirstTab()); 
+}, $cnxdb, [selectFirstTab()]); 
 
 microFmw::get('/dbCompSimple', function($app) {
     $app->render('dbCompSimple');
-}, $cnxdb, selectFirstTab()); 
-
-/*
-microFmw::post('/dbCompSimple', function($app) {
-    $app->render('dbCompSimple');
-}, $cnxdb, selectFirstTab()); 
-*/
+}, $cnxdb, [], ['servers'=>$liste_servers]); 

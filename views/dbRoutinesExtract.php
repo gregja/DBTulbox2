@@ -11,7 +11,6 @@ foreach ( $fields as $field ) {
 // récupération ou initialisation de l'offset 
 $offset = isset ( $_GET ['offset'] ) ? Sanitize::blinderGet('offset', '', 'intval' ) : 1;
 $params ['offset'] = $offset;
-
 ?>
 <fieldset><legend>Liste des routines DB2 (procédures stockées et fonctions)</legend>
 <form id="extraction" name="extraction" method="get" action="" >
@@ -161,12 +160,13 @@ if (array_key_exists ( 'nom_base', $params ) && array_key_exists ( 'nom_routine'
 						echo '<td>' . $data ['SPECIFIC_NAME'] . '</td>';
 					}
 					echo '</tr>';
+					$lastRowNumber++;
 				}
                 echo '<tbody>'.PHP_EOL;
 				echo '</table>';
 				echo '<br/>';
 				// Appel de la fonction de pagination
-				Pagination::pcIndexedLinks ( $nb_lignes_total, $offset, MAX_LINES_BY_PAGE, $currentScript, $params );
+				echo Pagination::pcIndexedLinks ( $nb_lignes_total, $offset, MAX_LINES_BY_PAGE, $currentScript, $params );
 				echo '<br/>';
 				echo "(Affichage " . $offset . " à " . ($offset + $lastRowNumber - 1) . " sur " . $nb_lignes_total . ")";
 			}

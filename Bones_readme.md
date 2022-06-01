@@ -1,28 +1,24 @@
-## Background
-Bones is based on a concept written by Dan Horrigan called Sammy. Bones was then adapted to create a simple PHP and CouchDB application to be covered in the upcoming book published by Packt Publishing
+## Bones
+Bones is based on a concept written by Dan Horrigan called Sammy. Bones was then adapted - by Tim Juravich - to create a simple PHP and CouchDB application, covered in the book below :
+
+"CouchDB and PHP Web Development Beginner's Guide", ed. Packt Publishing
+
+https://www.packtpub.com/product/web-development/9781849513586
+
+Bones is a quick attempt at a PHP sinatra-ish environment. 
 
 ## Github 
 The original repo of Bones is : 
 https://github.com/timjuravich/bones
 
-## Documentation
-The Bones class is explained in the excellent book of Tim Juravich :
-"CouchDB and PHP Web Development Beginner's Guide", ed. Packt Publishing
-https://www.packtpub.com/product/web-development/9781849513586
-
-## Bones
-Bones is a quick attempt at a PHP sinatra-ish environment.
-
-## Warning
-Tim Juravich explains in the original repo that : 
-"I only played a bit with the project, working only from localhost, it's possible that other configurations will break the logic. I'll test it more soon!"
-
 ## Implementation
 The implementation of Bones in DBTulbox2 is not exactly the same of the implementation of Tim Juravich, because I added some new features :
  * grouping functions GET, POST, PUT, DELETE into an abstract class "microFmw" (as static methods)
+ * addition of an interface on the Bones class to improve the robustness of the code
  * injection of a database connector
- * injection of Javascript code (optional) which is injected in the DOMCONTENTLOADED event of the layout page
-
+ * injection of Javascript code (optional) which will be injected in the DOMCONTENTLOADED event of the layout page
+ * injection of optional parameters (like a list of servers for example)
+ 
 ## Example
 Bones is a simple lib that you can add to a php file that will allow the following
 ```PHP

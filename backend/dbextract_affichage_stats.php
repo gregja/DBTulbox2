@@ -1,4 +1,5 @@
 <?php
+
 if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
     $cnxdb = $this->getDB();
     $schema = Sanitize::blinderGet('schema');
@@ -80,7 +81,8 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
     }
     echo '<br><br>'.PHP_EOL ;
     if (!$cet_objet_est_une_vue) {
-        echo HtmlToolbox::genHtmlLink( 'dbextract_aff_statcol.php?schema=' . $schema . '&table=' . $table, 'Analyse statistique des colonnes' ) . '<br/>';
+        // TODO : option à finaliser et à réactiver
+        //    echo HtmlToolbox::genHtmlLink( 'dbextract_aff_statcol.php?schema=' . $schema . '&table=' . $table, 'Analyse statistique des colonnes' ) . '<br/>';
     }
     echo '<br>'.PHP_EOL ;
     //echo HtmlToolbox::genHtmlLink( 'dbextract_aff_statbib.php?schema=' . $schema , 'Statistiques de la bibliothèque' ) . '<br/>';

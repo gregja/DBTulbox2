@@ -2,7 +2,7 @@
 abstract class SQLTools {
 	/**
 	 * 
-	 * Colorisation d'une requête SQL pour en faciliter la lecture (les mots réservés SQL sont affichés en bleu)
+	 * Colorisation d'une requÃªte SQL pour en faciliter la lecture (les mots rÃ©servÃ©s SQL sont affichÃ©s en bleu)
 	 * @param string $sql
 	 */
 	public static function coloriseCode($sql) {
@@ -15,12 +15,12 @@ abstract class SQLTools {
 		$sql = nl2br($sql);
 		$sql = str_replace ( "\t", "&nbsp;&nbsp;", $sql );
 		
-		// suppression des tabulations, et insertion d'un blanc après chaque virgule
+		// suppression des tabulations, et insertion d'un blanc aprÃ¨s chaque virgule
 		$sql = str_ireplace ( array ("\t", ', ', ',' ), array (' ', ',', ', ' ), trim ( $sql ) );
-		// définition des mots réservés SQL colorisés
+		// dÃ©finition des mots rÃ©servÃ©s SQL colorisÃ©s
 		$sql_orig = array ('label ', 'alter ', 'drop ', 'table ', 'column ', 'set data type ', 'view ', 'create ', 'index ', 'delete ', 'update ', 'select ', 'from ', 'where ', 'group by ', 'order by ', 'having ', ' case ', 'when ', 'then ', ' else ', ' end', ' and ', ' or ', ' like ', ' left outer join ', ' inner join ', ' on ', ' as ', 'date(' );
 		$nb_postes = count ( $sql_orig ) ;
-		// préparation du tableau contenant les mots réservés colorisés (et forcés en majuscule)
+		// prÃ©paration du tableau contenant les mots rÃ©servÃ©s colorisÃ©s (et forcÃ©s en majuscule)
 		$sql_dest = array ();
 		for($i = 0; $i < $nb_postes; $i ++) {
 			$sql_dest [] = '<font color = "' . $font_color . '">' . strtoupper ( $sql_orig [$i] ) . '</font>';

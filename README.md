@@ -36,12 +36,18 @@ require_once '../config_external.php';
 /*
  * profil de connexion DB2
 */
-//$usr = 'ROGERRABBIT';           // TODO : to customize
-//$pwd = 'ONRASEGRATIS';          // TODO : to customize
-//$ip = 'dev.acmecompany.com';    // TODO : to customize
+/*
+$usr = 'ROGERRABBIT';           // TODO : à personnaliser
+$pwd = 'ONRASEGRATIS';          // TODO : à personnaliser
+$ip = 'dev.acmecompany.com';    // TODO : à personnaliser
 
-//$liste_bibs[$ip] = array ('MYPRECIOUS1', 'MYPRECIOUS2' );  // TODO : to customize
+$liste_servers = [];
+$liste_servers[] = ['server' => $ip, 'lib' => ['MYPRECIOUS1', 'MYPRECIOUS2'] ];
+$liste_servers[] = ['server' => 'rec.acmecompany.com', 'usr'=> 'XXX', 'pwd' => 'ZZZ', 'lib' => []];
+$liste_servers[] = ['server' => 'prd.acmecompany.com', 'usr'=> 'XXX', 'pwd' => 'ZZZ', 'lib' => []];
+*/
 ```
+Warning : only the first item of the array $liste_servers is mandatory. This array is used for comparisons of databases based on one IBM i server (set only the first item), or for comparisons of datases based on multiple servers (in that case, you must set the item 2, or more...). 
 
 ## TODO LIST 
 

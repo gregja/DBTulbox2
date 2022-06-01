@@ -26,7 +26,7 @@
                     <a class="dropdown-item" href="<?php echo $this->make_route('dbTablesExtract'); ?>">Tables, Fichiers et Vues</a>
                     <a class="dropdown-item" href="<?php echo $this->make_route('dbColumnSearch'); ?>">Recherche sur colonnes</a>
                     <a class="dropdown-item" href="<?php echo $this->make_route('dbRoutinesExtract'); ?>">Procédures stockées et fonctions</a>
-                <!--    <a class="dropdown-item" href="<XXphp echo $this->make_route('dbCompSimple'); ?>">Comparaison BD simplifiée (à finaliser)</a> -->
+                    <a class="dropdown-item" href="<?php echo $this->make_route('dbCompSimple'); ?>">Comparaison BD simplifiée</a> 
                 <!--    <a class="dropdown-item" href="#">Comparaison BD détaillée (à finaliser)</a> -->
                     </div>
                 </li>

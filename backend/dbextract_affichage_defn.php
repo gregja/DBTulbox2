@@ -28,9 +28,8 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		}
 	}
         
-    echo '<legend><h6>'.$legende.'</h6></legend>'.PHP_EOL ;
+    echo '<legend><h6>'.$legende.'</h6></legend>'.PHP_EOL;
     
-    $class_row = HtmlToolbox::getReverseTableLineClass(false);
     echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
     echo '<thead class="thead-dark">'.PHP_EOL;
     echo '<tr class="header-row">';
@@ -39,8 +38,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
     echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
     foreach ( $tablestats as $key => $value ) {
         if (!is_null($value) && trim($value) != '') { 
-            $class_row = HtmlToolbox::getReverseTableLineClass($class_row);
-            echo '<tr class="'.HtmlToolbox::getTableLineClass($class_row).'">'.PHP_EOL ;
+            echo '<tr>'.PHP_EOL ;
             echo '<td>&nbsp;' . trim($key) . '&nbsp;</td>'.PHP_EOL ;
             echo '<td>&nbsp;' . trim($value) . '&nbsp;</td>'.PHP_EOL ;
             echo '<tr>'. PHP_EOL ;

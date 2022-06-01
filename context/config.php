@@ -4,8 +4,8 @@
  * Titre de l'application
  */
 define ( 'NOM_APPLI', 'ACME Productions' );
-define ( 'TYP_MENU_APP', '*standard') ;
-define ( 'MNU_APP_CONTEXT', '*IBMi') ;
+define ( 'TYP_MENU_APP', '*standard');
+define ( 'MNU_APP_CONTEXT', '*IBMi');
 
 /*
  * liste bibliothèques par environnement
@@ -19,11 +19,16 @@ require_once '../config_external.php';
 /*
  * profil de connexion DB2
 */
-//$usr = 'ROGERRABBIT';           // TODO : à personnaliser
-//$pwd = 'ONRASEGRATIS';          // TODO : à personnaliser
-//$ip = 'dev.acmecompany.com';    // TODO : à personnaliser
+/*
+$usr = 'ROGERRABBIT';           // TODO : à personnaliser
+$pwd = 'ONRASEGRATIS';          // TODO : à personnaliser
+$ip = 'dev.acmecompany.com';    // TODO : à personnaliser
 
-//$liste_bibs[$ip] = array ('MYPRECIOUS1', 'MYPRECIOUS2' );  // TODO : à personnaliser
+$liste_servers = [];
+$liste_servers[] = ['server' => $ip, 'lib' => ['MYPRECIOUS1', 'MYPRECIOUS2'] ];
+$liste_servers[] = ['server' => 'rec.acmecompany.com', 'usr'=> 'XXX', 'pwd' => 'ZZZ', 'lib' => []];
+$liste_servers[] = ['server' => 'prd.acmecompany.com', 'usr'=> 'XXX', 'pwd' => 'ZZZ', 'lib' => []];
+*/
 
 /*
  * Si la plateforme d'exécution est un IBMi alors on récupère son nom automatiquement,
@@ -31,11 +36,8 @@ require_once '../config_external.php';
  */
 if (Misc::isIBMiPlatform ()) {
 	$zend_server_type = 'ZS/i5' ; // environnement de type Zend Server sur i5
-
 	define ( 'TYPE_ENVIR_EXE', 'IBMi' );
 	define ( 'TYPE_ENVIR_APP', $ip );
-	define ( 'TYPE_ENVIR_APP02', $ip );
-	define ( 'TYPE_ENVIR_APP03', $ip );
 } else {
 	$zend_server_type = 'ZS/Win' ; // environnement de type Zend Server sur Windows
 	/*
@@ -44,8 +46,6 @@ if (Misc::isIBMiPlatform ()) {
 	 */
 	define ( 'TYPE_ENVIR_EXE', php_uname ( 's' ) );
 	define ( 'TYPE_ENVIR_APP', $ip );
-	define ( 'TYPE_ENVIR_APP02', $ip );
-	define ( 'TYPE_ENVIR_APP03', $ip );
 }
 
 define('DEBUG_MODE', false);

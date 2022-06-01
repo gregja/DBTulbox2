@@ -23,8 +23,6 @@ if (Misc::isIBMiPlatform ()) {
 
 	define ( 'TYPE_ENVIR_EXE', 'IBMi' );
 	define ( 'TYPE_ENVIR_APP', $ip );
-	define ( 'TYPE_ENVIR_APP02', $ip );
-	define ( 'TYPE_ENVIR_APP03', $ip );
 
 } else {
 	$zend_server_type = 'ZS/Win' ; // environnement de type Zend Server sur Windows
@@ -34,15 +32,15 @@ if (Misc::isIBMiPlatform ()) {
 	 */
 	define ( 'TYPE_ENVIR_EXE', php_uname ( 's' ) );
 	define ( 'TYPE_ENVIR_APP', $ip ); 
-	define ( 'TYPE_ENVIR_APP02', $ip );
-	define ( 'TYPE_ENVIR_APP03', $ip );
 }
 
 /*
- * liste bibliothèques par environnement
+ * liste des serveurs IBM i 
 */
-$liste_bibs = array ();
-$liste_bibs[$ip] = array ('XLIB1', 'XLIB2' );
+$liste_servers = [];
+$liste_servers[] = ['server' => $ip, 'lib' => ['MYPRECIOUS1', 'MYPRECIOUS2'] ];
+$liste_servers[] = ['server' => 'rec.acmecompany.com', 'usr'=> 'XXX', 'pwd' => 'ZZZ', 'lib' => []];
+
 
 if (TYPE_ENVIR_APP == $ip ) {
 	/*

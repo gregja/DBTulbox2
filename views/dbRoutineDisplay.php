@@ -1,6 +1,5 @@
 <?php
 $currentScript = 'dbRoutineDisplay';
-$display_options_test = true;
 
 if ($this->get_method() == 'GET' && array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'routine', $_GET )) {
     $cnxdb = $this->getDB();
@@ -137,10 +136,8 @@ BLOC;
             echo '<tr><th>Routine name</th><th>Routine schema</th><th>Object Schema</th></tr>'.PHP_EOL;
             echo '</thead>'.PHP_EOL;
             echo '<tbody>'.PHP_EOL;		
-            $class_row = HtmlToolbox::getReverseTableLineClass(false);
             foreach($data as $key=>$value) {
-                $class_row = HtmlToolbox::getReverseTableLineClass($class_row);
-                echo '<tr class="'.HtmlToolbox::getTableLineClass($class_row).'">';
+                echo '<tr>';
                 echo '<td>' . trim($value ['SPECIFIC_NAME']) . '</td>';
                 echo '<td>' . trim($value ['SPECIFIC_SCHEMA']) . '</td>';
                 echo '<td>' . trim($value ['OBJECT_SCHEMA']) . '</td>';

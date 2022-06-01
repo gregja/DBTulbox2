@@ -1,6 +1,14 @@
 <?php
-require_once 'lib/bones.php';
+require_once 'lib/Bones.php';
 require_once 'lib/Misc.php';
+
+define('ROOT', dirname(__FILE__));
+
+function my_autoloader($classname) {
+   include_once(ROOT . "/lib/" . $classname . ".php"); 
+}
+
+spl_autoload_register('my_autoloader');
 
 function fnc_detailed_err($errno, $errstr, $errfile, $errline, $errcontext) {
     $var = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile,
@@ -10,7 +18,6 @@ function fnc_detailed_err($errno, $errstr, $errfile, $errline, $errcontext) {
     var_dump($var);
     $dump = ob_get_clean();
     error_log($dump);
-
     die();
 }
 

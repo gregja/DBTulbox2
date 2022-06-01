@@ -1,18 +1,12 @@
 <?php
-// TODO : en cours de modification 
 $currentScript = 'dbCompSimple'; 
 
-// temporairement, je duplique la connexion 1 vers les 2 autres
-// TODO : à revoir pour intégrer plusieurs connecteurs
-$cnx_db01 = $this->getDB();
-$cnx_db02 = $cnx_db01;
-$cnx_db03 = $cnx_db01;
+$liste_servers = $this->getServers();
 
 $bib_a_analyser1 = Sanitize::blinderGet('bib_a_analyser1', '', 'strtoupper');
 $bib_a_analyser2 = Sanitize::blinderGet('bib_a_analyser2', '', 'strtoupper');
-$serveur1 = Sanitize::blinderGet('serveur1', '', 'strtoupper');
-$serveur2 = Sanitize::blinderGet('serveur2', '', 'strtoupper');
-$table_used_ref = Sanitize::blinderGet('table_used_ref', '', 'strtoupper');
+$serveur1 = Sanitize::blinderGet('serveur1', 'int');
+$serveur2 = Sanitize::blinderGet('serveur2', 'int');
 
 $anomalies = array();
 if (count($_GET) > 0) {
@@ -35,9 +29,18 @@ if (count($anomalies) > 0) {
 }
 
 if ($serveur1 == '' && $serveur2 == '') {
-    $serveur1 = TYPE_ENVIR_APP; // TYPE_ENVIR_APP02;
-    $serveur2 = TYPE_ENVIR_APP;
+    $serveur1 = 0; 
+    $serveur2 = 0;
 }
+
+$serverFilter = function () use ($liste_servers) {
+    $liste = [];
+    foreach($liste_servers as $key=>$value) {
+        $liste[] = $value['server'];
+    }
+    return $liste;
+} ;
+
 ?>
 <fieldset><legend>Recherche des écarts entre 2 bases de données DB2 (comparaison "simplifiée")</legend>
     <p>
@@ -45,27 +48,41 @@ if ($serveur1 == '' && $serveur2 == '') {
         que sur les noms de tables, sans chercher à comparer la structure des tables concordantes.<br>
     </p>
     <form id="extraction" name="extraction" method="get" action="">
-        <p><label for="bib_a_analyser1">Saisissez la bibliothèque du serveur 1 (obligatoire) :</label> 
-            <input type="text" name="bib_a_analyser1" id="bib_a_analyser1" size="20"
+        <div class="form-group row">    
+            <label for="bib_a_analyser1" class="col-sm-5 col-form-label">Saisissez la bibliothèque du serveur 1 (obligatoire) :</label> 
+            <div class="col-sm-3">
+            <input type="text" name="bib_a_analyser1" id="bib_a_analyser1" size="20" class="form-control"
                 value="<?php echo $bib_a_analyser1; ?>" required />
-            <img src="images/clear_left.png" id="bib_a_analyser1_clear" onclick="$('#bib_a_analyser1').val('');" alt="clear" />	
-        </p>
-        <p><label for="bib_a_analyser2">Saisissez la bibliothèque du serveur 2 (obligatoire) :</label> 
-            <input type="text" name="bib_a_analyser2" id="bib_a_analyser2" size="20"
+            </div>
+            <div class="col-sm-3">
+                <img src="images/clear_left.png" id="bib_a_analyser1_clear" onclick="$('#bib_a_analyser1').val('');" alt="clear" />	
+            </div>
+            </div>
+        </div>
+        <div class="form-group row">    
+            <label for="bib_a_analyser2" class="col-sm-5 col-form-label">Saisissez la bibliothèque du serveur 2 (obligatoire) :</label> 
+            <div class="col-sm-3">
+            <input type="text" name="bib_a_analyser2" id="bib_a_analyser2" size="20" class="form-control"
                 value="<?php echo $bib_a_analyser2; ?>" required />
-            <img src="images/clear_left.png" id="bib_a_analyser2_clear" onclick="$('#bib_a_analyser2').val('');" alt="clear"/>	
-        </p>
-        <fieldset><legend>Serveur 1</legend> 
-            <label for="serveur1-test"><input id="serveur1-test" name="serveur1" value="<?php echo TYPE_ENVIR_APP03; ?>" type="radio" <?php echo $serveur1 == TYPE_ENVIR_APP03 ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP03; ?></label>
-            <label for="serveur1-preprod"><input id="serveur1-preprod" name="serveur1" value="<?php echo TYPE_ENVIR_APP02; ?>" type="radio" <?php echo $serveur1 == TYPE_ENVIR_APP02 ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP02; ?></label>
-            <label for="serveur1-prod"><input id="serveur1-prod" name="serveur1" value="<?php echo TYPE_ENVIR_APP; ?>" type="radio" <?php echo $serveur1 == TYPE_ENVIR_APP ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP; ?></label>
-        </fieldset>
-        <fieldset><legend>Serveur 2</legend> 
-            <label for="serveur2-test"><input id="serveur2-test" name="serveur2" value="<?php echo TYPE_ENVIR_APP03; ?>" type="radio" <?php echo $serveur2 == TYPE_ENVIR_APP03 ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP03; ?></label>
-            <label for="serveur2-preprod"><input id="serveur2-preprod" name="serveur2" value="<?php echo TYPE_ENVIR_APP02; ?>" type="radio" <?php echo $serveur2 == TYPE_ENVIR_APP02 ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP02; ?></label>
-            <label for="serveur2-prod"><input id="serveur2-prod" name="serveur2" value="<?php echo TYPE_ENVIR_APP; ?>" type="radio" <?php echo $serveur2 == TYPE_ENVIR_APP ? ' checked="checked" ' : ''; ?>/><?php echo TYPE_ENVIR_APP; ?></label>
-        </fieldset>
-        <input type="submit" value="valider" name="crud_valid" id="crud_valid" /> 
+            </div>
+            <div class="col-sm-3">    
+                <img src="images/clear_left.png" id="bib_a_analyser2_clear" onclick="$('#bib_a_analyser2').val('');" alt="clear"/>	
+            </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="type_objet" class="col-sm-5 col-form-label">Serveur 1 </label>
+            <div class="col-sm-3">
+                <?php echo GenForm::inputSelect('serveur1', $serverFilter(), $serveur1) ;?>
+            </div>
+        </div>	
+        <div class="form-group row">
+            <label for="type_objet" class="col-sm-5 col-form-label">Serveur 2 </label>
+            <div class="col-sm-3">
+                <?php echo GenForm::inputSelect('serveur2', $serverFilter(), $serveur2) ;?>
+            </div>
+        </div>	
+        <input type="submit" value="valider" name="crud_valid" id="crud_valid" class="btn btn-primary" /> 
     <!--    <input type="submit" value="export_csv" name="crud_export_csv" id="crud_export_csv" /> -->
     </form>
 </fieldset>
@@ -73,49 +90,40 @@ if ($serveur1 == '' && $serveur2 == '') {
 <br />
 <?php
 if ($bib_a_analyser1 != '' && count($anomalies) == 0) {
-    /*
-     * si demandé, on ne retient que les tables et vues utilisées dans les
-     * procédures stockées servant à alimenter l'infocentre
-     */
-    if ($table_used_ref == 'ON') {
-        $ref_croisee = true;
-    } else {
-        $ref_croisee = false;
-    }
-    $sql = DB2Tools::extractDb2ObjectsFromLib(true, false, $ref_croisee);
-error_log($sql);
+    $cnx_db01 = $this->getDB();
+
+    $sql = DB2Tools::extractDb2ObjectsFromLib(true, false, false);
+
     $sql_count = 'with tmp as ('.$sql.') select count(*) as comptage from tmp' ;
 
-    if ($serveur1 == TYPE_ENVIR_APP) {
-        $stmt_ref1 = DBWrapper::getStatement($cnx_db01, $sql, array($bib_a_analyser1));
-        $tmp_comptage1 = DBWrapper::selectOne($cnx_db01, $sql_count, array($bib_a_analyser1)) ;
+    $stmt_ref1 = null;
+    $tmp_comptage1 = null;
+
+    if ($liste_servers[$serveur1]['server'] == TYPE_ENVIR_APP) {
+        $stmt_ref1 = $cnx_db01->getStatement($sql, array($bib_a_analyser1));
+        $tmp_comptage1 = $cnx_db01->selectOne($sql_count, array($bib_a_analyser1)) ;
     } else {
-        if ($serveur1 == TYPE_ENVIR_APP02) {
-            $stmt_ref1 = DBWrapper::getStatement($cnx_db02, $sql, array($bib_a_analyser1));
-            $tmp_comptage1 = DBWrapper::selectOne($cnx_db02, $sql_count, array($bib_a_analyser1)) ;
-        } else {
-            $stmt_ref1 = DBWrapper::getStatement($cnx_db03, $sql, array($bib_a_analyser1));
-            $tmp_comptage1 = DBWrapper::selectOne($cnx_db03, $sql_count, array($bib_a_analyser1)) ;
-        }
+        $tmp_cnx1 = $liste_servers[$serveur1]['cnx'];
+        $stmt_ref1 = $tmp_cnx1->getStatement($sql, array($bib_a_analyser1));
+        $tmp_comptage1 = $tmp_cnx1->selectOne($sql_count, array($bib_a_analyser1)) ;
     }
 
-    if ($serveur2 == TYPE_ENVIR_APP) {
-        $stmt_ref2 = DBWrapper::getStatement($cnx_db01, $sql, array($bib_a_analyser2));
-        $tmp_comptage2 = DBWrapper::selectOne($cnx_db01, $sql_count, array($bib_a_analyser1)) ;        
+    $stmt_ref2 = null;
+    $tmp_comptage2 = null;
+
+    if ($liste_servers[$serveur2]['server'] == TYPE_ENVIR_APP) {
+        $stmt_ref2 = $cnx_db01->getStatement($sql, array($bib_a_analyser2));
+        $tmp_comptage2 = $cnx_db01->selectOne($sql_count, array($bib_a_analyser2)) ;      
     } else {
-        if ($serveur2 == TYPE_ENVIR_APP02) {
-            $stmt_ref2 = DBWrapper::getStatement($cnx_db02, $sql, array($bib_a_analyser2));
-            $tmp_comptage2 = DBWrapper::selectOne($cnx_db02, $sql_count, array($bib_a_analyser1)) ;               
-        } else {
-            $stmt_ref2 = DBWrapper::getStatement($cnx_db03, $sql, array($bib_a_analyser2));
-            $tmp_comptage2 = DBWrapper::selectOne($cnx_db03, $sql_count, array($bib_a_analyser1)) ;               
-        }
+        $tmp_cnx2 = $liste_servers[$serveur2]['cnx'];
+        $stmt_ref2 = $tmp_cnx2->getStatement($sql, array($bib_a_analyser2));
+        $tmp_comptage2 = $tmp_cnx2->selectOne($sql_count, array($bib_a_analyser2)) ;
     }
 
     $comptage1 = isset($tmp_comptage1['COMPTAGE'])?$tmp_comptage1['COMPTAGE']:0 ;
     $comptage2 = isset($tmp_comptage2['COMPTAGE'])?$tmp_comptage2['COMPTAGE']:0 ;
 
-    echo '<br/>Liste des écarts constatés entre les bibliothèques : ' . $serveur1 . '/' . $bib_a_analyser1 . ' et ' . $serveur2 . '/' . $bib_a_analyser2 . '<br/><br/>';
+    echo '<br/>Liste des écarts constatés entre les bibliothèques : ' . $bib_a_analyser1 . ' et ' . $bib_a_analyser2 . '<br/><br/>';
 
     $tab_ecarts = array();
     $tab_vide = array();
@@ -189,8 +197,8 @@ error_log($sql);
 
         ExportOffice::csv('extract_comp_bib');
 
-        $entete_tableau [1] = 'Nom table pour ' . $serveur1 . '/' . $bib_a_analyser1;
-        $entete_tableau [7] = 'Nom table pour ' . $serveur2 . '/' . $bib_a_analyser2;
+        $entete_tableau [1] = 'Nom table pour ' . $bib_a_analyser1;
+        $entete_tableau [7] = 'Nom table pour ' . $bib_a_analyser2;
 
         $entete_tmp = array();
         foreach ($entete_tableau as $col) {
@@ -218,24 +226,27 @@ error_log($sql);
         exit();
     } else {
 
-        echo 'Nbre d\'objets sur référentiel1 : ' . $comptage1 . '<br/>';
-        echo 'Nbre d\'objets sur référentiel2 : ' . $comptage2 . '<br/>';
-        echo 'Nbre d\'écarts comptabilisés    : ' . count($tab_ecarts) . '<br/>';
+        echo 'Nombre d\'objets sur référentiel1 : ' . $comptage1 . '<br/>'; 
+        echo 'Nombre d\'objets sur référentiel2 : ' . $comptage2 . '<br/>';
+        echo 'Nombre d\'écarts comptabilisés    : ' . count($tab_ecarts) . '<br/>';
 
-        echo '<table border="1" width="100%" cellspacing="0" cellpadding="5" >';
-        echo '<tr class="header-row">';
+        echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
+        echo '<thead class="thead-dark">'.PHP_EOL;
+        echo '<tr>';
         echo '<th>&nbsp;</th>';
-        echo '<th scope="col">REF1 = ' . $serveur1 . '/' . $bib_a_analyser1 . '</th>';
-        echo '<th scope="col">REF2 = ' . $serveur2 . '/' . $bib_a_analyser2 . '</th>';
+        echo '<th scope="col">REF1 = ' . $bib_a_analyser1 . ' (serveur1)</th>';
+        echo '<th scope="col">REF2 = ' . $bib_a_analyser2 . ' (serveur2)</th>';
         echo '<th>&nbsp;</th>';
         echo '</tr>';
-        echo '<tr class="header-row">';
+        echo '<tr>';
         $entete = '';
         foreach ($entete_tableau as $col) {
-            $entete .= '<td>' . $col . '</td>';
+            $entete .= '<th>' . $col . '</th>';
         }
         echo $entete;
         echo '</tr>';
+        echo '</thead>'.PHP_EOL;
+        echo '<tbody>'.PHP_EOL;        
         foreach ($tab_ecarts as $key => $value) {
             echo '<tr>';
             if (isset($value ['ref1'] ['DBXLFI'])) {
@@ -258,4 +269,3 @@ error_log($sql);
         echo '</table>';
     }
 }
-//affiche_sql_debug();

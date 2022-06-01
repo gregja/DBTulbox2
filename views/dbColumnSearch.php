@@ -18,7 +18,7 @@ $offset = isset($_GET ['offset']) ? Sanitize::blinderGet('offset', '', 'intval')
 $params ['offset'] = $offset;
 ?>
 <fieldset>
-    <legend>Structure des tables et vues DB2</legend>
+    <legend>Analyse des colonnes de tables DB2</legend>
     <form id="extraction" name="extraction" method="get" action="" >
     <div class="form-group row">
         <label for="nom_col" class="col-sm-5 col-form-label">Saisissez un nom colonne SQL (obligatoire) (*) :</label>
@@ -140,11 +140,12 @@ if (array_key_exists('nom_col', $params) && $params['nom_col'] != '' && array_ke
                 echo '</tr>' . PHP_EOL;
                 $lastRowNumber++;
             }
-            echo '<tbody>'.PHP_EOL;
+            echo '</tbody>'.PHP_EOL;
             echo '</table>' . PHP_EOL;
             echo '<br/>';
             // Appel de la fonction de pagination
-            Pagination::pcIndexedLinks($nb_lignes_total, $offset, MAX_LINES_BY_PAGE, $currentScript, $params);
+            echo Pagination::pcIndexedLinks ( $nb_lignes_total, $offset, MAX_LINES_BY_PAGE, $currentScript, $params );
+
             echo '<br/>' . PHP_EOL;
             echo "(Affichage " . $offset . " à " . ($offset + $lastRowNumber - 1) . " sur " . $nb_lignes_total . ")";
         }

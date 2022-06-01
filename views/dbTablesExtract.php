@@ -22,7 +22,7 @@ $params ['offset'] = $offset;
 	</div>
 	<div class="col-sm-3">
 	<!--	<img src="images/search.gif" id="nom_base_icon"  onclick="$('#nom_base').focus();" alt="search" /> -->
-		<img src="images/clear_left.png" id="nom_base_clear" border="0" onclick="$('#nom_base').val('');" alt="clear" />
+		<img src="images/clear_left.png" id="nom_base_clear" onclick="$('#nom_base').val('');" alt="clear" />
 	</div>
 </div>
 <div class="form-group row">
@@ -32,7 +32,7 @@ $params ['offset'] = $offset;
 	value="<?php echo $params['nom_table']; ?>" />
 	</div>
 	<div class="col-sm-3">
-		<img src="images/clear_left.png" id="nom_table_clear" border="0" onclick="$('#nom_table').val('');" alt="clear" />	
+		<img src="images/clear_left.png" id="nom_table_clear" onclick="$('#nom_table').val('');" alt="clear" />	
 	</div>
 </div>
 <div class="form-group row">
@@ -50,7 +50,7 @@ $params ['offset'] = $offset;
 </div><br>
 <p><h6><small>(*) : La recherche de table se fait à la fois sur nom long et sur nom court. 
 	Il est possible de suffixer la saisie avec un %, ce qui déclenche une recherche de type "contient".</small></h6></p>
-<input type="submit" value="valider" name="crud_valid" id="crud_valid" class="btn btn-primary" /> 
+<input type="submit" value="valider" name="crud_valid" id="crud_valid" class="btn btn-primary" />
 <!--
 <input type="submit" value="export_csv" name="crud_export_csv" id="crud_export_csv" class="btn btn-secondary"/>
 <input type="submit" value="export_sql" name="crud_export_sql" id="crud_export_sql" class="btn btn-secondary"/>
@@ -161,12 +161,7 @@ if ($this->get_method() == 'GET' && array_key_exists('nom_table', $_GET)) {
 					//   Serait-ce un problème de driver ?
 					//$datas = $cnxdb->getScrollCursor ($sql, $criteres, $offset, MAX_LINES_BY_PAGE, 'TABLE_NAME' );
 					$datas = $cnxdb->getPagination ( $sql, $criteres, $offset, MAX_LINES_BY_PAGE, 'TABLE_NAME' );
-					/*
-					 * si demandé, on élimine de la liste les tables inutilisées par une recherche multi-sources
-					 */
-					if (array_key_exists ( 'table_used_src', $params ) && $params ['table_used_src'] == 'ON') {
-						GenProcDb2::liste_DeleteTablesNotUsed ( $datas );
-					}
+
 					$lastRowNumber = 0;
 					echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
 					echo '<thead class="thead-dark">'.PHP_EOL;
@@ -196,6 +191,7 @@ if ($this->get_method() == 'GET' && array_key_exists('nom_table', $_GET)) {
 							echo '<td>' . $data ['SPECIFIC_NAME'] . '</td>'.PHP_EOL;
 						}
 						echo '</tr>'.PHP_EOL;
+						$lastRowNumber++;
 					}
 					echo '</tbody>'.PHP_EOL;
 					echo '</table>'.PHP_EOL;
