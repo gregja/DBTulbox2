@@ -1,11 +1,13 @@
 <!DOCTYPE html>
+<html>
     <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width">
-    <link href="<?php echo $this->make_route('public/css/bootstrap-4.6.1-dist/bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" />
-    <script src="<?php echo $this->make_route('js/jquery-3.6.0.min.js'); ?>"></script>
-    <script src="<?php echo $this->make_route('public/js/bootstrap-4.6.1-dist/bootstrap.min.js'); ?>"></script>
+<!--    <link href="xxphp echo $this->make_route('public/css/bootstrap-4.6.1-dist/bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" /> -->
+    <link href="public/css/bootstrap-4.6.1-dist/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="public/js/jquery-3.6.0.min.js"></script>
+    <script src="public/js/bootstrap-4.6.1-dist/bootstrap.min.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-light bg-dark">

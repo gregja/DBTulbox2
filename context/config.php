@@ -35,15 +35,11 @@ $liste_servers[] = ['server' => 'prd.acmecompany.com', 'usr'=> 'XXX', 'pwd' => '
  * dans le cas contraire, on définit manuellement la machine cible hébergeant la base DB2
  */
 if (Misc::isIBMiPlatform ()) {
-	$zend_server_type = 'ZS/i5' ; // environnement de type Zend Server sur i5
+	// environnement de type Zend Server sur IBM i
 	define ( 'TYPE_ENVIR_EXE', 'IBMi' );
 	define ( 'TYPE_ENVIR_APP', $ip );
 } else {
-	$zend_server_type = 'ZS/Win' ; // environnement de type Zend Server sur Windows
-	/*
-	 * dans le contexte Windows, les machines associées aux environnements sont définies en dur ci-dessous
-	 * exemple de liste de machines : 'TEST', 'PREPROD', 'PROD', etc.
-	 */
+	// stack PHP hors IBM i
 	define ( 'TYPE_ENVIR_EXE', php_uname ( 's' ) );
 	define ( 'TYPE_ENVIR_APP', $ip );
 }

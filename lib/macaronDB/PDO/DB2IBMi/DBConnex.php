@@ -74,19 +74,19 @@ class PDO_DB2IBMi_DBConnex {
         if (self::$_instance instanceof PDO) {
             self::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$_instance->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-            if (isset($options ['DB2_ATTR_CASE'])) {
-                if (strtoupper($options ['DB2_ATTR_CASE']) == 'LOWER') {
-                    self::$_instance->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-                } else {
-                    self::$_instance->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
-                }
-            }
-        } else {
-            error_log('FATAL ERROR : Exception sur connexion DB dans la méthode ' . __METHOD__ . ' de la classe ' . __CLASS__);
-            error_log('FATAL ERROR : DSN= ' . $dsn);
-            error_log('FATAL ERROR : ' . $e->getMessage());
-            return false ;
+			if (isset($options ['DB2_ATTR_CASE'])) {
+				$casse = strtoupper($options ['DB2_ATTR_CASE']);
+				if ($casse == 'LOWER') {
+					self::$_instance->setAttribute ( PDO::ATTR_CASE, PDO::CASE_LOWER );
+				} else {
+					if ($casse == 'NATURAL') {
+						self::$_instance->setAttribute ( PDO::ATTR_CASE, PDO::CASE_NATURAL );
+					} else {
+                        // $casse == 'UPPER'
+						self::$_instance->setAttribute ( PDO::ATTR_CASE, PDO::CASE_UPPER );
+					}
+				}
+			}
         }
 
         return self::$_instance;

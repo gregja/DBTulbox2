@@ -7,12 +7,17 @@ if ($this->get_method() == 'GET' && array_key_exists ( 'schema', $_GET ) && arra
 	$schema = Sanitize::blinderGet('schema') ;
 	$table  = Sanitize::blinderGet('table') ;
 	
+	$system_schema = '';
+	$system_table = '';
+	$type_objet = 'X';
 	$sql = DB2Tools::extractTableInfo();
 	$data = $cnxdb->selectOne ( $sql, array ($schema, $table ) );
-	$system_schema = trim($data['SYSTEM_TABLE_SCHEMA']) ;
-	$system_table  = trim($data['SYSTEM_TABLE_NAME']) ;
+	if ($data) {
+		$system_schema = trim($data['SYSTEM_TABLE_SCHEMA']) ;
+		$system_table  = trim($data['SYSTEM_TABLE_NAME']) ;
+		$type_objet    = trim($data ['TABLE_TYPE']) ;
+	}
 
-    $type_objet = $data ['TABLE_TYPE'] ;
 	if ($type_objet == 'V') {
 		$cet_objet_est_une_vue = true;
 		echo '<h3>Description de la vue : '.$schema.'/'.$table . '</h3>';
@@ -23,7 +28,11 @@ if ($this->get_method() == 'GET' && array_key_exists ( 'schema', $_GET ) && arra
 			if ($type_objet == 'M') {
 				echo '<h3>Description de la MQT : '.$schema.'/'.$table . '</h3>';                        
             } else {
-				echo '<h3>Description de la table : '.$schema.'/'.$table . '</h3>';
+				if ($type_objet == 'X') {
+					echo '<h3>Description non trouvée pour la table : '.$schema.'/'.$table . '</h3>';
+				} else {
+					echo '<h3>Description de la table : '.$schema.'/'.$table . '</h3>';
+				}
             }
 		}
 	}
@@ -68,12 +77,13 @@ if ($this->get_method() == 'GET' && array_key_exists ( 'schema', $_GET ) && arra
 		{$tabs_menu_out}
 		</ul>
 		<div class="tab-content">
-BLOC;	  
-		foreach($menus as $ndx => $menu) {
-			if ($menu['script'] != '') {
+BLOC;
+
+		foreach($menus as $ndx => $xmenu) {
+			if (trim($xmenu['script']) != '') {
 				$index = $ndx+1;
 				echo '<div id="option'.$index.'" class="tab-pane fade ">'.PHP_EOL;
-				require $menu['script'];
+				require $xmenu['script'];
 				echo '</div>'.PHP_EOL;
 			}
 

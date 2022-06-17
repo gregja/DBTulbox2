@@ -5,9 +5,7 @@ abstract class Misc {
 	 * Renvoie "true" si le serveur est un IBM i, "false" dans le cas contraire
 	 */
 	public static function isIBMiPlatform () {
-	
 		return (php_uname('s') == 'OS400' || PHP_OS == "AIX" || PHP_OS == "OS400") ? true : false;
-	
 	}
 	
 	/**
@@ -24,15 +22,13 @@ abstract class Misc {
 	 * @param unknown_type $start
 	 */
 	public static function getTimeDiff($start) {
-
 		$stop = self::getMicrotime() ;
 		return round ( ($stop - $start) * 1000, 2 );
-	
 	}
 	
 	/**
 	 * technique basique pour identifier si le navigateur est IE ou pas
-	 * (nécessaire notamment pour régler des différence d'affichage entre IE et Firefox)
+	 * (nÃ©cessaire notamment pour rÃ©gler des diffÃ©rence d'affichage entre IE et Firefox)
 	 */
 	public static function isNavigatorIE () {
 		$is_ie = strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
@@ -48,24 +44,24 @@ abstract class Misc {
 	}
 	
 	/**
-	 * fonction basique destinée à aider le développeur, et surtout destinée à évoluer
-	 * (pourrait dans l'avenir alimenter un fichier de log différent de la log standard php)
+	 * fonction basique destinÃ©e Ã  aider le dÃ©veloppeur, et surtout destinÃ©e Ã  Ã©voluer
+	 * (pourrait dans l'avenir alimenter un fichier de log diffÃ©rent de la log standard php)
 	 * @param unknown_type $var
-	 * @param boolean $affiche  (true = affiche à l'écran via un var_dump formaté)
+	 * @param boolean $affiche  (true = affiche Ã  l'Ã©cran via un var_dump formatÃ©)
 	 */
 	public static function assistDebug($var, $affiche=false) {
-		// envoie systématique dans la log
+		// envoie systÃ©matique dans la log
 		ob_start() ;
 		var_dump($var);
 		$dump = ob_get_clean() ;
 		error_log($dump);
 	
-		// affichage dans le flux html si demandé
+		// affichage dans le flux html si demandÃ©
 		if ($affiche) {
 			echo '<pre>';
 			var_dump($dump);
 			echo '</pre>';
 		}
 	}
-	
+
 }

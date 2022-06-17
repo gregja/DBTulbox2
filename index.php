@@ -1,6 +1,5 @@
 <?php
 require_once 'lib/Bones.php';
-require_once 'lib/Misc.php';
 
 define('ROOT', dirname(__FILE__));
 

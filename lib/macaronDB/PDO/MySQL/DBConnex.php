@@ -50,10 +50,15 @@ class PDO_MySQL_DBConnex {
 			self::$_instance->setAttribute ( PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC );
 
 			if (isset($options ['DB2_ATTR_CASE'])) {
-				if (strtoupper($options ['DB2_ATTR_CASE']) == 'LOWER') {
+				$casse = strtoupper($options ['DB2_ATTR_CASE']);
+				if ($casse == 'LOWER') {
 					self::$_instance->setAttribute ( PDO::ATTR_CASE, PDO::CASE_LOWER );
 				} else {
-					self::$_instance->setAttribute ( PDO::ATTR_CASE, PDO::CASE_UPPER );
+					if ($casse == 'NATURAL') {
+						self::$_instance->setAttribute ( PDO::ATTR_CASE, PDO::CASE_NATURAL );
+					} else {
+						self::$_instance->setAttribute ( PDO::ATTR_CASE, PDO::CASE_UPPER );
+					}
 				}
 			}
 

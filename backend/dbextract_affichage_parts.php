@@ -37,9 +37,9 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 				$sql_inv = DB2Tools::findTableFromSsystemName();
 				$data_inv = $cnxdb->selectOne($sql_inv, array (trim($data_dep['DBFLIB']), trim($data_dep['DBFFIL']) ) ) ;
 				if ($data_inv) {
-					echo ' => Nom long : '. trim($data_inv['TABLE_SCHEMA']).'/'.$data_inv['TABLE_NAME'];
-				} else {
-					echo 'merde';
+					echo ' => Nom long : '.HtmlToolbox::genHtmlLink('dbTableDisplay?schema=' . trim($data_inv ['TABLE_SCHEMA']) . 
+					'&table=' . trim($data_inv ['TABLE_NAME']),
+					 trim($data_inv ['TABLE_SCHEMA']).'/'.trim($data_inv ['TABLE_NAME']));
 				}
 				echo '<br>'.PHP_EOL;
 
@@ -86,7 +86,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
                         $data ['FIELD'] = trim($data ['FIELD']) ;
 			echo '<td>' . $data ['FIELD'] . '</td>';
 			echo '<td>' . trim($data ['SYSTEM_COLUMN_NAME']) . '</td>';
-			if (trim($data ['COLUMN_TEXT']) == '') {
+			if (isset($data ['COLUMN_TEXT']) && trim($data ['COLUMN_TEXT']) == '') {
 				echo '<td>' . trim($data ['COLUMN_HEADING']) . '</td>';
 			} else {
 				echo '<td>' . trim($data ['COLUMN_TEXT']) . '</td>';

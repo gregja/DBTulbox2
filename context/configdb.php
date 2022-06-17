@@ -18,7 +18,8 @@ if (! isset ( $cnxdb )) {
 		require_once '../lib/macaronDB/DB2/IBMi/DBWrapper.php';
 		require_once '../lib/macaronDB/DB2/IBMi/DBConnex.php';
 		require_once '../lib/macaronDB/DB2/IBMi/DBInstance.php';
-		$cnxdb = new DB2_IBMi_DBInstance(TYPE_ENVIR_APP, $usr, $pwd, $options ) ;
+		//$cnxdb = new DB2_IBMi_DBInstance(TYPE_ENVIR_APP, $usr, $pwd, $options ) ;
+		$cnxdb = new DB2_IBMi_DBInstance(TYPE_ENVIR_APP, $usr, $pwd ) ;
 		abstract class DBWrapper extends DB2_IBMi_DBWrapper {} ;		
 	} else {
 		/*

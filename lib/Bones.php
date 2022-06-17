@@ -53,6 +53,7 @@ class Bones implements BonesInterface {
     public $route_variables = array();
     public static $cnxdb = null;
     public static $options = [];
+    private $root = 'DBTulbox2';
 
     public function __construct() {
         $this->route = $this->get_route();
@@ -146,7 +147,14 @@ class Bones implements BonesInterface {
 
     public function make_route($path = '') {
         $url = explode("/", $_SERVER['PHP_SELF']);
-        return '/' . $url[1] . '/' . $path;
+        $nbr = count($url);
+        if ((php_uname('s') == 'OS400' || PHP_OS == "AIX" || PHP_OS == "OS400")) {
+            // sur IBMi avec ZendServer, $url contient 4 postes 
+            return '/'. $url[$nbr-3] . '/' . $url[$nbr-2] . '/' . $path; 
+        } else {
+            // sur XAMPP, $url contient 3 postes
+            return '/'. $url[$nbr-2] . '/' . $path; 
+        }
     }
 
     protected function get_method() {
@@ -163,7 +171,6 @@ class Bones implements BonesInterface {
         } else {
             return '';
         }
-
 	}
 	
     public function request($key) {
