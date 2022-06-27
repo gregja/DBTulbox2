@@ -24,6 +24,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		echo 'Datastructure non trouvée pour la table '.$schema.'/'.$table . '<br/>';
 	} else {
 		$list_cols = array ();
+		$list_cols_nomcourts = array();
 		echo '<fieldset>';
 		if ($cet_objet_est_une_vue) {
 			echo '<legend><h6>Liste des colonnes renvoyées par la vue : '.$schema.'/'.$table . '</h6></legend>';
@@ -37,9 +38,11 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 				$sql_inv = DB2Tools::findTableFromSsystemName();
 				$data_inv = $cnxdb->selectOne($sql_inv, array (trim($data_dep['DBFLIB']), trim($data_dep['DBFFIL']) ) ) ;
 				if ($data_inv) {
-					echo ' => Nom long : '.HtmlToolbox::genHtmlLink('dbTableDisplay?schema=' . trim($data_inv ['TABLE_SCHEMA']) . 
-					'&table=' . trim($data_inv ['TABLE_NAME']),
+					echo ' => Nom long : '.HtmlToolbox::genHtmlLink('dbTableDisplay?schema=' . trim($data_inv ['TABLE_SCHEMA']) . '&table=' 
+					. trim($data_inv ['TABLE_NAME']),
 					 trim($data_inv ['TABLE_SCHEMA']).'/'.trim($data_inv ['TABLE_NAME']));
+				} else {
+					echo 'merde';
 				}
 				echo '<br>'.PHP_EOL;
 
@@ -81,6 +84,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
 		foreach ( $datastructure as $data ) {
 			$list_cols [] = trim($data ['FIELD']);
+			$list_cols_nomcourts [] = trim($data ['SYSTEM_COLUMN_NAME']);
 			echo '<tr>';
 			echo '<td align="right">' . $data ['ORDINAL_POSITION'] . '</td>';
                         $data ['FIELD'] = trim($data ['FIELD']) ;
@@ -120,30 +124,85 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		echo '</div>'.PHP_EOL ;
 		
 		/*
-		 * affichage de la liste des colonnes séparées par une virgule (pratique pour les INSERT)
+		 * Affichages complémentaires (pour faciliter l'écriture de différents types de requêtes)
 		 */
 		if (count ( $list_cols ) > 0) { 
-			echo '<div>'.PHP_EOL ;
-			echo '<h4 href="#">Liste des colonnes pour INSERT SQL</h4>'.PHP_EOL;
-			echo '<div class="container">'.PHP_EOL ;
+			$tmp_list_cols = implode ( ', ', $list_cols ) . '<br/>';
+			$tmp_list_shorts = implode ( ', ', $list_cols_nomcourts ) . '<br/>';
+			$tmp_list_shorts2 = [];
+			$tmp_camel_cols = [];
+			foreach($list_cols as $idx=>$col) {
+				$tmp_alias = '"' . str_replace('_', '', ucwords(strtolower($col), '_')) . '"';
+				$tmp_camel_cols []= $col . ' AS ' . $tmp_alias ;
+				$tmp_nom_court = $list_cols_nomcourts[$idx];
+				$tmp_list_shorts2 []= $tmp_nom_court . ' AS ' . $tmp_alias;
+			}
+			$final_camel_cols = implode ( ', ', $tmp_camel_cols ) . '<br/>';
+			$tmp_list_shorts2 = implode ( ', ', $tmp_list_shorts2 ) . '<br/>';
 
-			echo '<br/>';
-			echo '<fieldset><legend>Liste des colonnes (format optimisé pour INSERT SQL) : </legend>' . PHP_EOL;		
-			echo implode ( ', ', $list_cols ) . '<br/>';
-			echo '</fieldset>'.PHP_EOL;
-
+			$tmp_query_sum = '';
+			$button_query_sum = '';
 			if (count($tab_col_dec)>0) {
 				$tmp_col_nodec = implode(', ', $tab_col_nodec) ;
-				echo '<br/>';
-				echo '<fieldset><legend>Requête de cumul "type" : </legend>' . PHP_EOL;
-				echo 'SELECT ' . $tmp_col_nodec . ', ' . 
+				$tmp_query_sum .= '<p><h4>Requête de cumul : </h4></p>' . PHP_EOL;
+				$tmp_query_sum .= 'SELECT ' . $tmp_col_nodec . ', ' . 
 						implode(', ', $tab_col_dec). '<br>' .PHP_EOL ;
-				echo 'FROM '.$schema.'.'.$table. '<br>' .PHP_EOL ;
-				echo 'GROUP BY '. $tmp_col_nodec . '<br>' . PHP_EOL ;
-				echo '</fieldset>'.PHP_EOL;
+				$tmp_query_sum .= 'FROM '.$schema.'.'.$table. '<br>' .PHP_EOL ;
+				$tmp_query_sum .= 'GROUP BY '. $tmp_col_nodec . '<br>' . PHP_EOL ;
+				$button_query_sum = <<<BLOC_BTN
+	<br><br><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseQuerySum" aria-expanded="false" aria-controls="collapseExample">
+	Requête de cumul (pour SELECT)
+	</button>
+BLOC_BTN;
 			}
-			echo '</div>'.PHP_EOL ;
-			echo '</div>'.PHP_EOL ;
+
+			echo <<<BLOC_HTML
+			<p>
+			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseListColumns" aria-expanded="false" aria-controls="collapseExample">
+			Liste des colonnes (noms longs)
+			</button>
+			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseListCamelColumns" aria-expanded="false" aria-controls="collapseExample">
+			Liste des colonnes (noms longs, alias en "Camel Case") 
+			</button>
+			<br><br>
+			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseListColumnsShorts" aria-expanded="false" aria-controls="collapseExample">
+			Liste des colonnes (noms courts)
+			</button>
+			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseListColumnsShorts2" aria-expanded="false" aria-controls="collapseExample">
+			Liste des colonnes (noms courts, alias sur noms longs en "camel case")
+			</button>
+			{$button_query_sum}
+		</p>
+		<div class="collapse" id="collapseListColumns">
+			<div class="card card-body">
+			<p><h4>Liste des colonnes avec noms longs, pour SELECT ou INSERT</h4></p>
+			{$tmp_list_cols}
+			</div>
+		</div>
+		<div class="collapse" id="collapseListColumnsShorts">
+			<div class="card card-body">
+			<p><h4>Liste des colonnes avec noms courts, pour SELECT ou INSERT</h4></p>
+			{$tmp_list_shorts}
+			</div>
+		</div>
+		<div class="collapse" id="collapseListColumnsShorts2">
+			<div class="card card-body">
+			<p><h4>Liste des colonnes (noms courts,  alias sur noms longs en "camel case")</h4></p>
+			{$tmp_list_shorts2}
+			</div>
+		</div>		
+		<div class="collapse" id="collapseListCamelColumns">
+			<div class="card card-body">
+			<p><h4>Liste des colonnes (noms longs, alias en "Camel Case", pour SELECT)</h4></p>
+			{$final_camel_cols}
+			</div>
+		</div>
+		<div class="collapse" id="collapseQuerySum">
+			<div class="card card-body">
+			{$tmp_query_sum}
+			</div>
+		</div>		
+BLOC_HTML;
 		}
 	}	
 }
