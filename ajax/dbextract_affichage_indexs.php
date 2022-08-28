@@ -57,41 +57,45 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
         $flag = $cnxdb->executeSysCommand($cmd);
         $indexeslist = $cnxdb->selectBlock($sql);
 
-		if (!is_array($indexeslist) || count ( $indexeslist ) <= 0) {
+		if (!$indexeslist || count ( $indexeslist ) == 0 ) {
 			echo 'Pas d\'indexs DDS définis sur cette table.<br/>';
 		} else {
-			echo 'Nombre d\'indexs dépendants détectés par la commande DSPDBR : ' . count ( $indexeslist ) . '<br/>';
-			echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
-			echo '<thead class="thead-dark">'.PHP_EOL;
-			echo '<tr class="header-row">';
-			echo '<th>Schéma</th><th>Index</th><th>Keys</th>';
-			echo '</tr>'.PHP_EOL ;
-			echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
-			foreach ( $indexeslist as $dataindex ) {
-				list($cmdx, $sqlx) = DB2Tools::extractIndexKeys($dataindex ['FILE'], $dataindex ['LIBRARY']);
-				$cnxdb->executeSysCommand($cmdx);
-				$indexKeys = $cnxdb->selectBlock($sqlx);
-				$tmpkeys = [];
-				foreach($indexKeys as $dtax) {
-					if (trim($dtax['KEY']) != '') {
-						$sens = '';
-						if ($dtax['SENS'] == 'D') $sens = ' (DESC)';
-						$tmpkeys [] = $dtax['KEY'] . $sens;
+			if (count ( $indexeslist ) == 1 && trim($indexeslist[0]['FILE']) == '' ) {
+				echo 'Pas d\'indexs DDS définis sur cette table.<br/>';
+			} else {
+				echo 'Nombre d\'indexs dépendants détectés par la commande DSPDBR : ' . count ( $indexeslist ) . '<br/>';
+				echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
+				echo '<thead class="thead-dark">'.PHP_EOL;
+				echo '<tr class="header-row">';
+				echo '<th>Schéma</th><th>Index</th><th>Keys</th>';
+				echo '</tr>'.PHP_EOL ;
+				echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
+				foreach ( $indexeslist as $dataindex ) {
+					list($cmdx, $sqlx) = DB2Tools::extractIndexKeys($dataindex ['FILE'], $dataindex ['LIBRARY']);
+					$cnxdb->executeSysCommand($cmdx);
+					$indexKeys = $cnxdb->selectBlock($sqlx);
+					$tmpkeys = [];
+					foreach($indexKeys as $dtax) {
+						if (trim($dtax['KEY']) != '') {
+							$sens = '';
+							if ($dtax['SENS'] == 'D') $sens = ' (DESC)';
+							$tmpkeys [] = $dtax['KEY'] . $sens;
+						}
 					}
+					if (count($tmpkeys) > 0) {
+						$keys = implode(', ', $tmpkeys);
+					} else {
+						$keys = 'Index de type "surrogate"';
+					}
+					echo '<tr>';
+					echo '<td>' . $dataindex ['LIBRARY'] . '</td>';
+					echo '<td>' . $dataindex ['FILE'] . '</td>';
+					echo '<td>' . $keys . '</td>';
+					echo '</tr>';
 				}
-				if (count($tmpkeys) > 0) {
-					$keys = implode(', ', $tmpkeys);
-				} else {
-					$keys = 'Index de type "surrogate"';
-				}
-				echo '<tr>';
-				echo '<td>' . $dataindex ['LIBRARY'] . '</td>';
-				echo '<td>' . $dataindex ['FILE'] . '</td>';
-				echo '<td>' . $keys . '</td>';
-				echo '</tr>';
+				echo '</tbody>';
+				echo '</table>';
 			}
-			echo '</tbody>';
-			echo '</table>';
 		}
 
 		echo '</fieldset>';

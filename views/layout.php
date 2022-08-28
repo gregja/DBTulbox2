@@ -39,7 +39,8 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="http://www.dpriver.com/pp/sqlformat.htm?ref=g_wangz" target="_blank">Assistant SQL</a>
                     <a class="dropdown-item" href="https://codepen.io/gregja/full/pBRxdK" target="_blank">SQL generator for lazy dev</a>
-                    <a class="dropdown-item" href="https://www.ibm.com/docs/fr/db2/10.5?topic=messages-sqlstate" target="_blank">SQL States DB2</a>
+                    <a class="dropdown-item" href="https://www.ibm.com/docs/fr/db2/10.5?topic=messages-sqlstate" target="_blank">SQL States DB2 LUW</a>
+                    <a class="dropdown-item" href="https://www.ibm.com/docs/en/i/7.3?topic=codes-listing-sql-messages" target="_blank">SQL States DB2 for i</a>
                     <a class="dropdown-item" href="http://www.connectionstrings.com" target="_blank">ConnectionStrings</a>
                     <a class="dropdown-item" href="http://troels.arvin.dk/db/rdbms/" target="_blank">Comparatif BD de Troels Arvin</a>
                     <a class="dropdown-item" href="http://fadace.developpez.com/sgbdcmp/fonctions/" target="_blank">Comparatif BD de Fabien Celaia</a>

@@ -33,17 +33,23 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 				echo '<legend><h6>Description de l\'index : '.$schema.'/'.$table . '</h6></legend>';
 				$sql_dep = DB2Tools::extractDependanceInverse();
 				$data_dep = $cnxdb->selectOne($sql_dep, array ($system_schema, $system_table ) ) ;
-				echo 'Table sous-jacente : ' . trim($data_dep['DBFLIB']).'/'.$data_dep['DBFFIL'] ;
-				
-				$sql_inv = DB2Tools::findTableFromSsystemName();
-				$data_inv = $cnxdb->selectOne($sql_inv, array (trim($data_dep['DBFLIB']), trim($data_dep['DBFFIL']) ) ) ;
-				if ($data_inv) {
-					echo ' => Nom long : '.HtmlToolbox::genHtmlLink('dbTableDisplay?schema=' . trim($data_inv ['TABLE_SCHEMA']) . '&table=' 
-					. trim($data_inv ['TABLE_NAME']),
-					 trim($data_inv ['TABLE_SCHEMA']).'/'.trim($data_inv ['TABLE_NAME']));
+				echo 'Table sous-jacente : ';
+				if ($data_dep) {
+					echo trim($data_dep['DBFLIB']).'/'.$data_dep['DBFFIL'] ;
+
+					$sql_inv = DB2Tools::findTableFromSystemName();
+					$data_inv = $cnxdb->selectOne($sql_inv, array (trim($data_dep['DBFLIB']), trim($data_dep['DBFFIL']) ) ) ;
+					if ($data_inv) {
+						echo ' => Nom long : '.HtmlToolbox::genHtmlLink('dbTableDisplay?schema=' . trim($data_inv ['TABLE_SCHEMA']) . '&table=' 
+						. trim($data_inv ['TABLE_NAME']),
+						 trim($data_inv ['TABLE_SCHEMA']).'/'.trim($data_inv ['TABLE_NAME']));
+					} else {
+						echo ' => Nom long : donnée indisponible';
+					}
 				} else {
-					echo 'merde';
+					echo 'donnée indisponible (problème de droits sur QADBFDEP)';
 				}
+				
 				echo '<br>'.PHP_EOL;
 
 				$sql_index = DB2Tools::extractSysindexkeys (true, 'NO');
@@ -90,12 +96,16 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
                         $data ['FIELD'] = trim($data ['FIELD']) ;
 			echo '<td>' . $data ['FIELD'] . '</td>';
 			echo '<td>' . trim($data ['SYSTEM_COLUMN_NAME']) . '</td>';
-			if (isset($data ['COLUMN_TEXT']) && trim($data ['COLUMN_TEXT']) == '') {
-				echo '<td>' . trim($data ['COLUMN_HEADING']) . '</td>';
-			} else {
+			if (isset($data ['COLUMN_TEXT']) && trim($data ['COLUMN_TEXT']) != '') {
 				echo '<td>' . trim($data ['COLUMN_TEXT']) . '</td>';
+			} else {
+				if (isset($data ['COLUMN_HEADING']) && trim($data ['COLUMN_HEADING']) != '') {
+					echo '<td>' . trim($data ['COLUMN_HEADING']) . '</td>';
+				} else {
+					echo '<td>&nbsp;</td>';
+				}
 			}
-                        $data ['DATA_TYPE'] = trim($data ['DATA_TYPE']) ;
+            $data ['DATA_TYPE'] = trim($data ['DATA_TYPE']) ;
 			if ($data ['DATA_TYPE'] == 'VARCHAR') {
 				echo '<td><font color = "red">' . $data ['DATA_TYPE'] . '</font></td>';
 			} else {
@@ -133,6 +143,8 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 			$tmp_camel_cols = [];
 			foreach($list_cols as $idx=>$col) {
 				$tmp_alias = '"' . str_replace('_', '', ucwords(strtolower($col), '_')) . '"';
+				// astuce pour forcer le mode "lower camel case"
+				$tmp_alias = strtolower(substr($tmp_alias, 0, 2)) . substr($tmp_alias, 2);
 				$tmp_camel_cols []= $col . ' AS ' . $tmp_alias ;
 				$tmp_nom_court = $list_cols_nomcourts[$idx];
 				$tmp_list_shorts2 []= $tmp_nom_court . ' AS ' . $tmp_alias;

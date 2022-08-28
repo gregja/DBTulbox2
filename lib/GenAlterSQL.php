@@ -444,6 +444,7 @@ BLOC_TMP_MQT;
                 $liste_indexs [] = array(
                     'INDEX_SCHEMA' => trim($dataindex ['INDEX_SCHEMA']),
                     'INDEX_NAME' => trim($dataindex ['INDEX_NAME']),
+                    'SYSTEM_INDEX_SCHEMA' => trim($dataindex ['SYSTEM_INDEX_SCHEMA']),
                     'SYSTEM_INDEX_NAME' => trim($dataindex ['SYSTEM_INDEX_NAME']),
                     'INDEX_SQL' => trim($dataindex ['INDEX_SQL']),
                     'INDEX_TYPE' => trim($dataindex ['INDEX_TYPE']),

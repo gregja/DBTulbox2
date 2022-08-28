@@ -1,5 +1,6 @@
 <?php
 require_once 'lib/Bones.php';
+//require_once 'lib/Misc.php';
 
 define('ROOT', dirname(__FILE__));
 
@@ -35,7 +36,7 @@ set_include_path('.'
         . PATH_SEPARATOR . APP_PATH_STD . DIRECTORY_SEPARATOR . 'lib' .
         DIRECTORY_SEPARATOR . 'macaronDB' . DIRECTORY_SEPARATOR
         . PATH_SEPARATOR . get_include_path());
-
+//error_log(get_include_path());
 require_once 'context/config.php';
 require_once 'context/configdb.php';
 require_once 'routes.php';

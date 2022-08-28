@@ -122,9 +122,9 @@ abstract class DB2Tools implements intDB2Tools {
     const BIB_SYS = 'QSYS2';
 
     /*
-     * renvoi de la bib de r�f�rence BIB_REF_DTA (pour l'instant stock�e en constante),
-     * mais si on d�cide de modifier la souce de cette information, il suffira de modifier
-     * cette m�thode
+     * renvoi de la bib de référence BIB_REF_DTA (pour l'instant stockée en constante),
+     * mais si on décide de modifier la souce de cette information, il suffira de modifier
+     * cette méthode
      */
 
     private static function get_bib_ref_dta() {
@@ -132,9 +132,9 @@ abstract class DB2Tools implements intDB2Tools {
     }
 
     /*
-     * renvoi de la bib de r�f�rence BIB_REF_PGM (pour l'instant stock�e en constante),
-     * mais si on d�cide de modifier la souce de cette information, il suffira de modifier
-     * cette m�thode
+     * renvoi de la bib de référence BIB_REF_PGM (pour l'instant stockée en constante),
+     * mais si on décide de modifier la souce de cette information, il suffira de modifier
+     * cette méthode
      */
 
     private static function get_bib_ref_pgm() {
@@ -143,7 +143,7 @@ abstract class DB2Tools implements intDB2Tools {
 
     public static function convertirCaracteresAccentues($chaine) {
         $dirty = array('{', '}', '@');
-        $clean = array('�', '�', '�');
+        $clean = array('é', 'è', 'à');
         return str_replace($dirty, $clean, $chaine);
     }
 
@@ -196,7 +196,7 @@ abstract class DB2Tools implements intDB2Tools {
             $sql_include = ' AND A.DBXLFI IN ('.$sql_include.') ' ;
         }
         if ($table_name_only === true) {
-            // renvoi des seuls noms d'objets, incluant �ventuellement les noms courts
+            // renvoi des seuls noms d'objets, incluant éventuellement les noms courts
             if ($table_name_include_short_name === true) {
                 $sql = <<<BLOC_SQL
 SELECT distinct A.DBXLFI, A.DBXFIL
@@ -213,7 +213,7 @@ ORDER BY A.DBXLFI
 BLOC_SQL;
             }
         } else {
-            // structure plus compl�te pour analyse d�taill�e
+            // structure plus complète pour analyse détaillée
             if ($creator==true) {
                 $definer = ', A.DBXDEFINER' ;
             } else {
@@ -321,6 +321,7 @@ BLOC_SQL;
     }
 
     public static function extractTableStat($nom_table, $nom_schema) {
+        $bib_sys = self::BIB_SYS;
         $nom_schema = trim($nom_schema);
         $nom_table = trim($nom_table);
         $wheres = array();
@@ -350,16 +351,14 @@ SELECT TABLE_SCHEMA, TABLE_NAME, SYSTEM_TABLE_SCHEMA, SYSTEM_TABLE_NAME
     INDEX_BUILDS, LOGICAL_READS, PHYSICAL_READS, SEQUENTIAL_READS, 
     RANDOM_READS, 
         NUMBER_PARTITIONING_KEYS 
-FROM QSYS2{SEPARATOR}SYSTABLESTAT
+FROM {$bib_sys}{SEPARATOR}SYSTABLESTAT
 {$criteres_sql} 
 BLOC_SQL;
 
-/*
- * mots clés retirés du SELECT de la requête SQL ci-dessus car jugés peu
- * pertinents :
-    CLUSTERED, ACTIVE_BLOCKS, 
-    VARIABLE_LENGTH_SIZE, FIXED_LENGTH_EXTENTS, VARIABLE_LENGTH_EXTENTS,
- */
+        /*
+        * mots clés retirés du SELECT de la requête SQL ci-dessus car jugés peu utiles :
+            CLUSTERED, ACTIVE_BLOCKS, VARIABLE_LENGTH_SIZE, FIXED_LENGTH_EXTENTS, VARIABLE_LENGTH_EXTENTS
+        */
         return $sql;
     }
     
@@ -438,8 +437,6 @@ BLOC_SQL;
     }
 
     public static function extractTableStruct($data_from_system_table = false, $columns_only = false) {
-
-
         $bib_sys = self::BIB_SYS;
         if ($columns_only) {
             $from_table = self::defineTypeTableName($data_from_system_table, 'c');
@@ -479,10 +476,10 @@ SELECT
  c.IDENTITY_INCREMENT, c.IDENTITY_MINIMUM, c.IDENTITY_MAXIMUM,
  c.IDENTITY_CYCLE, c.IDENTITY_CACHE, c.IDENTITY_ORDER 
 FROM {$bib_sys}{SEPARATOR}systables A, 
-   TABLE (QSYS2{SEPARATOR}QSQSYSCOL2(A.system_table_schema, A.system_table_name) ) AS c 
+   TABLE ({$bib_sys}{SEPARATOR}QSQSYSCOL2(A.system_table_schema, A.system_table_name) ) AS c 
 WHERE {$from_table} 
 ) c 
-  LEFT JOIN (QSYS2{SEPARATOR}SYSKEYCST k JOIN QSYS2{SEPARATOR}SYSCST tc
+  LEFT JOIN ({$bib_sys}{SEPARATOR}SYSKEYCST k JOIN {$bib_sys}{SEPARATOR}SYSCST tc
      ON (k.TABLE_SCHEMA = tc.TABLE_SCHEMA
        AND k.TABLE_NAME = tc.TABLE_NAME
        AND LEFT(tc.type,1) = 'P'))
@@ -494,14 +491,14 @@ BLOC_SQL;
         return $sql;
     }
 
-    public static function findTableFromSsystemName() {
+    public static function findTableFromSystemName() {
         $bib_sys = self::BIB_SYS ;
         $sql = <<<BLOC_SQL
 SELECT A.TABLE_SCHEMA, A.TABLE_NAME,  
   A.TABLE_OWNER, A.TABLE_TYPE, A.COLUMN_COUNT, A.ROW_LENGTH, 
   ifnull(A.TABLE_TEXT, '') as TABLE_TEXT              
 FROM {$bib_sys}{SEPARATOR}SYSTABLES A 
-WHERE A.SYSTEM_TABLE_SCHEMA = ? AND A.SYSTEM_TABLE_NAME = ?
+WHERE rtrim(A.SYSTEM_TABLE_SCHEMA) = ? AND rtrim(A.SYSTEM_TABLE_NAME) = ?
 BLOC_SQL;
         return $sql;
     }
@@ -727,6 +724,17 @@ BLOC_SQL;
         return $sql;
     }
 
+    public static function getRoutineSpecificName() {
+        $bib_sys = self::BIB_SYS;
+
+        $sql = <<<BLOC_SQL
+SELECT specific_schema, specific_name 
+FROM {$bib_sys}{SEPARATOR}SYSROUTINE 
+WHERE routine_schema = ? and routine_name = ?
+BLOC_SQL;
+        return $sql;
+    }
+
     public static function extractSysroutinedep() {
 
         $bib_sys = self::BIB_SYS;
@@ -746,10 +754,13 @@ BLOC_SQL;
         $bib_sys = self::BIB_SYS;
 
         $sql = <<<BLOC_SQL
-SELECT distinct SPECIFIC_SCHEMA, SPECIFIC_NAME, OBJECT_SCHEMA
-FROM {$bib_sys}{SEPARATOR}SYSROUTINEDEP
-WHERE OBJECT_NAME = ?
-ORDER BY SPECIFIC_SCHEMA, SPECIFIC_NAME
+SELECT distinct A.SPECIFIC_SCHEMA, A.SPECIFIC_NAME, A.OBJECT_SCHEMA, B.ROUTINE_SCHEMA, B.ROUTINE_NAME,
+    B.ROUTINE_TYPE
+FROM {$bib_sys}{SEPARATOR}SYSROUTINEDEP A
+INNER JOIN {$bib_sys}{SEPARATOR}SYSROUTINES B
+  ON A.SPECIFIC_SCHEMA = B.SPECIFIC_SCHEMA AND A.SPECIFIC_NAME = B.SPECIFIC_NAME
+WHERE A.OBJECT_NAME = ?
+ORDER BY A.SPECIFIC_SCHEMA, A.SPECIFIC_NAME
 BLOC_SQL;
 
         return $sql;
@@ -1180,6 +1191,7 @@ BLOC_SQL;
     }
             
     public static function checkObjectExists($object_type) {
+        $bib_sys = self::BIB_SYS;
         $object_type = trim(strtoupper($object_type)) ;
         switch ($object_type) {
             case 'TABLE' :  {
@@ -1215,7 +1227,7 @@ BLOC_SQL;
             }           
         }
         
-        return "select count(*) as found from qsys2.{$table_check} where {$col_schema} = ? and {$col_table} = ?" ;
+        return "select count(*) as found from {$bib_sys}{SEPARATOR}{$table_check} where {$col_schema} = ? and {$col_table} = ?" ;
 
     }
     
@@ -1223,5 +1235,48 @@ BLOC_SQL;
         return array('QSYS2' , 'GENERATE_SQL') ; 
     }
 
+    public static function getTableLocks() {
+        $bib_sys = self::BIB_SYS;
+        return <<<SQL
+        SELECT *
+        FROM {$bib_sys}{SEPARATOR}RECORD_LOCK_INFO 
+        WHERE SYSTEM_TABLE_NAME = ?
+          AND SYSTEM_TABLE_SCHEMA = ?
+SQL;
+    }
+
+
+    public static function getTableTriggers() {
+        $bib_sys = self::BIB_SYS;
+        return <<<SQL
+SELECT TRIGGER_SCHEMA, TRIGGER_NAME, EVENT_MANIPULATION, ACTION_ORDER, ACTION_CONDITION, 
+       ACTION_ORIENTATION, ACTION_TIMING, TRIGGER_MODE, 
+       DATE(CREATED) as CREADATE, TRIGGER_PROGRAM_NAME, TRIGGER_PROGRAM_LIBRARY
+FROM {$bib_sys}{SEPARATOR}SYSTRIGGERS
+WHERE EVENT_OBJECT_SCHEMA = ? AND EVENT_OBJECT_TABLE = ?
+SQL;
+    }
+
+    public static function getTriggerDesc() {
+        $bib_sys = self::BIB_SYS;
+        return <<<SQL
+SELECT * FROM {$bib_sys}{SEPARATOR}SYSTRIGGERS
+WHERE TRIGGER_SCHEMA = ? AND TRIGGER_NAME = ?
+SQL;
+    }
+
+    public static function extractSystrigdep() {
+
+        $bib_sys = self::BIB_SYS;
+
+        $sql = <<<BLOC_SQL
+SELECT distinct OBJECT_NAME, OBJECT_SCHEMA, OBJECT_TYPE
+FROM {$bib_sys}{SEPARATOR}SYSTRIGDEP
+WHERE TRIGGER_SCHEMA = ? AND TRIGGER_NAME = ? 
+ORDER BY OBJECT_TYPE DESC, OBJECT_NAME
+BLOC_SQL;
+
+        return $sql;
+    }
 }
 

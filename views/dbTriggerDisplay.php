@@ -1,24 +1,17 @@
 <?php
-$currentScript = 'dbRoutineDisplay';
+$currentScript = 'dbTriggerDisplay';
 
-if ($this->get_method() == 'GET' && array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'routine', $_GET )) {
+if ($this->get_method() == 'GET' && array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'trigger', $_GET )) {
     $cnxdb = $this->getDB();
 	$schema = Sanitize::blinderGet('schema') ;
-	$routine  = Sanitize::blinderGet('routine') ;
-    $type  = Sanitize::blinderGet('type') ;
+	$trigger  = Sanitize::blinderGet('trigger') ;
 
-    if ($type == 'PROCEDURE') {
-        $type_objet = 'procédure stockée';
-    } else {
-        $type_objet = 'fonction';
-    }
-    echo '<h3>Description de la '.$type_objet.' : '.$schema.'/'.$routine . '</h3>';
+    echo '<h3>Description du trigger : '.$schema.'/'.$trigger . '</h3>';
 
     $menus = [
-        ['desc'=> 'Définition', 'script' => 'backend/dbextract_affroutine_defn.php', 'load'=>'initial'],
-        ['desc'=> 'Source SQL', 'load' => 'differed', 'script' => 'dbTableDisplaySourceProc' ],
-        ['desc'=> 'Objets utilisés', 'load' => 'differed', 'script' => 'dbRoutineDisplayObjUsed'],
-        ['desc'=> 'Objets utilisateurs', 'load' => 'differed', 'script' => 'dbRoutineDisplayObjUsers']
+        ['desc'=> 'Définition', 'script' => 'backend/dbextract_afftrigger_defn.php', 'load'=>'initial'],
+        ['desc'=> 'Source SQL', 'load' => 'differed', 'script' => 'dbTriggerDisplaySource' ],
+        ['desc'=> 'Objets utilisés', 'load' => 'differed', 'script' => 'dbTriggerDisplayObjUsed']
     ];
 
     $tabs_menu = [];

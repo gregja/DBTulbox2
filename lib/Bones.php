@@ -192,7 +192,14 @@ class Bones implements BonesInterface {
 		}
     }
 
-	public function display_flash($variable = 'error') {
+	public function renderAjax($view, $refreshBtn=false) {
+		if (!static::$rendered) {
+			static::$rendered = true;
+			include(ROOT. '/ajax/' . $view . '.php');
+		}
+    }
+
+    public function display_flash($variable = 'error') {
 		if (isset($this->vars[$variable])) {
 			return "<div class='alert-holder'><div class='alert-message " . $variable . "'><p>" . $this->vars[$variable] . "</p></div></div>";
 		}

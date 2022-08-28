@@ -1,8 +1,14 @@
 <?php
-if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET )) {
+if (array_key_exists ( 'schema', $_GET ) && 
+		( array_key_exists ( 'table', $_GET ) || array_key_exists ( 'routine', $_GET ))) {
 	$cnxdb = $this->getDB();	
 	$schema = Sanitize::blinderGet ( 'schema');
-	$table = Sanitize::blinderGet ( 'table');
+	if (array_key_exists ( 'routine', $_GET )) {
+		$table = Sanitize::blinderGet ( 'routine');
+	} else {
+		$table = Sanitize::blinderGet ( 'table');
+	}
+
 	$sql = DB2Tools::extractTableInfo ();
 	$data = $cnxdb->selectOne ( $sql, array ($schema, $table ) );
         
@@ -39,7 +45,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 			$dtaidx = $cnxdb->selectOne ( $sqlchkidx, array ($schema, $table ) );
 			if ($dtaidx && count($dtaidx) == 1 && $dtaidx['FOUND'] == '0') {
 				$flag_sysroutine_ok = false;
-				error_log('Génération source SQL impossible pour index '. $table);	
+				//error_log('Génération source SQL impossible pour index '. $table);	
 			}
 		}
 		

@@ -1,18 +1,15 @@
 <?php
-// TODO : brouillon à retravailler
 
 if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
-
+	$cnxdb = $this->getDB();
     $schema = Sanitize::blinderGet('schema');
     $table = Sanitize::blinderGet('table');
-    $sql = DB2Tools::extractTableInfo();
-    $data = $cnx_db01->selectOne($sql, array($schema, $table));
+    $data = $cnxdb->selectOne(DB2Tools::extractTableInfo(), array($schema, $table));
     $datatyp = $data ['TABLE_TYPE'];
 
     if ($datatyp == 'V' || $datatyp == 'M') {
 
         echo '<div>' . PHP_EOL;
-        //echo '<h4 href="#">>Liste des objets utilisés</h4>'.PHP_EOL;
         echo '<div class="container">' . PHP_EOL;
 
         if ($datatyp == 'V') {
@@ -23,27 +20,43 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
             $type_obj = 'MQT';
         }
         echo '<fieldset><legend>Liste des objets utilisés par la ' .
-        $type_obj . ' ' . $schema . '/' . $table . '</legend>' . PHP_EOL;
+            $type_obj . ' ' . $schema . '/' . $table . '</legend>' . PHP_EOL;
 
-        $data = $cnx_db01->selectBlock($sql, array($schema, $table));
+        $data = $cnxdb->selectBlock($sql, array($schema, $table));
         if (is_array($data) && count($data) > 0) {
-            echo '<table border="1" cellspacing="0" cellpadding="5" >' . PHP_EOL;
-            echo '<tr class="header-row"><td>Object name</td><td>Object schema</td><td>Object type</td><td>Sys.tab.name</td><td>Sys.tab.schema</td><td>Table name</td></tr>' . PHP_EOL;
+            echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
+            echo '<thead class="thead-dark">'.PHP_EOL;
+            echo '<th>Object name</th><th>Object schema</th><th>Object type</th><th>Sys.tab.name</th><th>Sys.tab.schema</th><th>Table name</th></tr>' . PHP_EOL;
+            echo '</thead>'.PHP_EOL;
+            echo '<tbody>'.PHP_EOL;
             foreach ($data as $key => $value) {
                 $get_params = 'schema=' . trim($value ['OBJECT_SCHEMA']) . '&amp;table=' . trim($value ['OBJECT_NAME']);
                 echo '<tr>' . PHP_EOL;
                 if (trim($value ['OBJECT_TYPE']) == 'TABLE' || trim($value ['OBJECT_TYPE']) == 'VIEW') {
-                    echo '<td><a href="dbextract_affichage.php?' . $get_params . '">' . trim($value ['OBJECT_NAME']) . '</a></td>' . PHP_EOL;
+                    echo '<td><a href="dbTableDisplay?' . $get_params . '">' . trim($value ['OBJECT_NAME']) . '</a></td>' . PHP_EOL;
                 } else {
                     echo '<td>' . trim($value ['OBJECT_NAME']) . '</td>' . PHP_EOL;
                 }
                 echo '<td>' . trim($value ['OBJECT_SCHEMA']) . '</td>' . PHP_EOL;
                 echo '<td>' . trim($value ['OBJECT_TYPE']) . '</td>' . PHP_EOL;
-                echo '<td>' . trim($value ['SYSTEM_TABLE_NAME']) . '</td>' . PHP_EOL;
-                echo '<td>' . trim($value ['SYSTEM_TABLE_SCHEMA']) . '</td>' . PHP_EOL;
-                echo '<td>' . trim($value ['TABLE_NAME']) . '</td>' . PHP_EOL;
+                if ($value ['SYSTEM_TABLE_NAME']) {
+                    echo '<td>' . trim($value ['SYSTEM_TABLE_NAME']) . '</td>' . PHP_EOL;
+                } else {
+                    echo '<td>&nbsp;</td>'.PHP_EOL;
+                }
+                if ($value ['SYSTEM_TABLE_SCHEMA']) {
+                    echo '<td>' . trim($value ['SYSTEM_TABLE_SCHEMA']) . '</td>' . PHP_EOL;
+                } else {
+                    echo '<td>&nbsp;</td>'.PHP_EOL;
+                }
+                if ($value ['TABLE_NAME']) {
+                    echo '<td>' . trim($value ['TABLE_NAME']) . '</td>' . PHP_EOL;
+                } else {
+                    echo '<td>&nbsp;</td>'.PHP_EOL;
+                }
                 echo '<tr>' . PHP_EOL;
             }
+            echo '</tbody>'.PHP_EOL;
             echo '</table>' . PHP_EOL;
         } else {
             echo '<br/>';
@@ -63,5 +76,7 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
         
         echo '</div>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
+    } else {
+        echo '<h3>Type d\'objet incorrect pour cette option </h3>';
     }
 }

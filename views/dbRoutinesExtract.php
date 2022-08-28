@@ -148,7 +148,9 @@ if (array_key_exists ( 'nom_base', $params ) && array_key_exists ( 'nom_routine'
 				foreach ( $datas as $data ) {
 					echo '<tr>';					
 					echo '<td>' . $data ['ROUTINE_SCHEMA'] . '</td>';
-					echo '<td>' . HtmlToolbox::genHtmlLink ( 'dbRoutineDisplay?schema=' . trim ( $data ['ROUTINE_SCHEMA'] ) . '&routine=' . trim ( $data ['ROUTINE_NAME'] ), trim ( $data ['ROUTINE_NAME'] ) ) . '</td>';
+					echo '<td>' . HtmlToolbox::genHtmlLink ( 'dbRoutineDisplay?schema=' . trim ( $data ['ROUTINE_SCHEMA'] ) .
+					 '&routine=' . trim ( $data ['ROUTINE_NAME'] ) .
+					 '&type=' . trim ( $data ['ROUTINE_TYPE'] ), trim ( $data ['ROUTINE_NAME'] ) ) . '</td>';
 					echo '<td>' . $data ['ROUTINE_TYPE'] . '</td>';
 					echo '<td>' . $data ['ROUTINE_BODY'] . '</td>';
 					echo '<td>' . $data ['IS_DETERMINISTIC'] . '</td>';
