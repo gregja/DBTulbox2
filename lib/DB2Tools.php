@@ -1278,5 +1278,20 @@ BLOC_SQL;
 
         return $sql;
     }
+
+    public static function extractSystrigdepInverse() {
+
+        $bib_sys = self::BIB_SYS;
+
+        $sql = <<<BLOC_SQL
+SELECT TRIGGER_NAME, TRIGGER_SCHEMA
+FROM {$bib_sys}{SEPARATOR}SYSTRIGDEP
+WHERE OBJECT_SCHEMA = ? AND OBJECT_NAME = ? 
+ORDER BY TRIGGER_NAME, TRIGGER_SCHEMA
+BLOC_SQL;
+
+        return $sql;
+    }
 }
+
 

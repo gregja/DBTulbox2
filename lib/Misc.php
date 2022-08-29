@@ -64,4 +64,15 @@ abstract class Misc {
 		}
 	}
 
+	/**
+	 * Function dashesToCamelCase
+	 */
+	public static function dashesToCamelCase($string, $capitalizeFirstChar = false, $separator="_") {
+		$str = str_replace($separator, '', ucwords(strtolower($string), $separator));
+		if (!$capitalizeFirstChar) {
+			$str = strtolower(substr($str, 0, 1)) . substr($str, 1);
+		}
+		return $str;
+	}
+
 }

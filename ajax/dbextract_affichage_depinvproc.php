@@ -22,7 +22,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'routine', $_GET 
         echo '<div class="container">'.PHP_EOL ;
         echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
         echo '<thead class="thead-dark">'.PHP_EOL;
-        echo '<tr><th>Routine name</th><th>Routine schema</th><th>Object Schema</th></tr>'.PHP_EOL;
+        echo '<tr><th>Routine name</th><th>Routine schema</th><th>Routine type</th></tr>'.PHP_EOL;
         echo '</thead>'.PHP_EOL;
         echo '<tbody>'.PHP_EOL;		
         foreach($data as $key=>$value) {
@@ -34,7 +34,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'routine', $_GET 
             echo '<td><a href="dbRoutineDisplay?'.$get_params.'">' . trim($value ['ROUTINE_NAME']) . '</a></td>'.PHP_EOL;
 
             echo '<td>' . trim($value ['ROUTINE_SCHEMA']) . '</td>';
-            echo '<td>' . trim($value ['OBJECT_SCHEMA']) . '</td>';
+            echo '<td>' . trim($value ['ROUTINE_TYPE']) . '</td>';
             echo '<tr>' .PHP_EOL;
         }
         echo '</tbody>'.PHP_EOL;	

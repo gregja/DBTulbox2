@@ -49,15 +49,16 @@ $liste_servers[] = ['server' => 'prd.acmecompany.com', 'usr'=> 'XXX', 'pwd' => '
 ```
 Warning : only the first item of the array $liste_servers is mandatory. This array is used for comparisons of databases based on one IBM i server (set only the first item), or for comparisons of datases based on multiple servers (in that case, you must set the item 2, or more...). 
 
-## Droits spéciaux
+## Special authorizations
 
-Le profil utilisateur IBM i à utiliser avec cette application doit disposer de droits en lecture sur les principales tables système de la bibliothèque QSYS2 (SYSTABLES, SYSCOLUMNS, SYSVIEWS, etc.), mais aussi sur trois tables de la bibliothèque QSYS, qui sont les suivantes:
+The IBM i user profile to be used with this application must have read privileges on the main system tables of the QSYS2 library (SYSTABLES, SYSCOLUMNS, SYSVIEWS, etc.), but also on three tables of the QSYS library, which are:
+
 
 - QSYS/QADBFDEP 
 - QSYS/QADBKFLD
 - QSYS/QADBXREF
 
-Les deux premières tables sont surtout utiles pour récupérer certaines métadonnées relatives aux fichiers de type "surrogate" notamment. La troisième est nécessaire pour permettre le bon fonctionnement de l'option de comparaison de bibliothèques.
+The first two tables are especially useful for retrieving certain metadata related to "surrogate" files. The third is necessary to allow the library comparison option to work properly.
 
 
 ## TODO LIST 
@@ -69,7 +70,7 @@ Shortlist of improvements I want to add :
  * and much more... :)
  * searching on tables : add "A" (alias) and "M" (MQT) filters
  *   ....              : add "description column" filter
- * display table : if type_table = "A", use systables columns BASE_TABLE_NAME & BASE_TABLE_SCHEMA to find the tartet table
+ * display table : if type_table = "A", use systables columns BASE_TABLE_NAME & BASE_TABLE_SCHEMA to find the target table
 
  
 

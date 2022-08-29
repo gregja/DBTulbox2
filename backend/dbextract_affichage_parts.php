@@ -1,4 +1,5 @@
 <?php
+
 if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET )) {
 	$cnxdb = $this->getDB();
 	$schema = Sanitize::blinderGet('schema') ;
@@ -142,9 +143,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 			$tmp_list_shorts2 = [];
 			$tmp_camel_cols = [];
 			foreach($list_cols as $idx=>$col) {
-				$tmp_alias = '"' . str_replace('_', '', ucwords(strtolower($col), '_')) . '"';
-				// astuce pour forcer le mode "lower camel case"
-				$tmp_alias = strtolower(substr($tmp_alias, 0, 2)) . substr($tmp_alias, 2);
+				$tmp_alias = '"' . Misc::dashesToCamelCase($col) . '"';
 				$tmp_camel_cols []= $col . ' AS ' . $tmp_alias ;
 				$tmp_nom_court = $list_cols_nomcourts[$idx];
 				$tmp_list_shorts2 []= $tmp_nom_court . ' AS ' . $tmp_alias;

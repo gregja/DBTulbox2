@@ -28,7 +28,14 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'routine', $_GET 
             if (trim($value ['OBJECT_TYPE']) == 'TABLE' || trim($value ['OBJECT_TYPE']) == 'VIEW') {
                 echo '<td><a href="dbTableDisplay?' . $get_params . '">' . trim($value ['OBJECT_NAME']) . '</a></td>' . PHP_EOL;
             } else {
-                echo '<td>' . trim($value ['OBJECT_NAME']) . '</td>' . PHP_EOL;
+                if (trim($value ['OBJECT_SCHEMA']) != 'CURRENT PATH' && 
+                    (trim($value ['OBJECT_TYPE']) == 'PROCEDURE' || trim($value ['OBJECT_TYPE']) == 'FUNCTION')) {
+                    $get_params = 'schema=' . trim($value ['OBJECT_SCHEMA']) . '&amp;routine=' . trim($value ['OBJECT_NAME']) .
+                    '&amp;type=' . trim($value ['OBJECT_TYPE']);
+                    echo '<td><a href="dbRoutineDisplay?' . $get_params . '">' . trim($value ['OBJECT_NAME']) . '</a></td>' . PHP_EOL;
+                } else {
+                    echo '<td>' . trim($value ['OBJECT_NAME']) . '</td>' . PHP_EOL;
+                }
             }
             echo '<td>' . trim($value ['OBJECT_SCHEMA']) . '</td>';
             echo '<td>' . trim($value ['OBJECT_TYPE']) . '</td>';
