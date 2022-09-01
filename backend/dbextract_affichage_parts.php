@@ -87,7 +87,11 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		echo 'Nombre de colonnes : ' . count ( $datastructure ) . '<br/><br/>'.PHP_EOL;
 		echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
 		echo '<thead class="thead-dark">'.PHP_EOL;
-		echo '<tr><th>Num.</th><th>Nom de colonne (long)</th><th>Nom court</th><th>Libell&eacute;</th><th>Type</th><th>Longueur</th><th>Pr&eacute;cision</th><th>CCSID</th><th>Null</th><th>Identit&eacute;</th></tr>'.PHP_EOL;
+		echo '<tr><th>Num.</th><th>Nom de colonne (long)</th>';
+		if (!$cet_objet_est_une_vue) {
+			echo '<th>Nom court</th>';
+		}
+		echo '<th>Libell&eacute;</th><th>Type</th><th>Longueur</th><th>Pr&eacute;cision</th><th>CCSID</th><th>Null</th><th>Identit&eacute;</th></tr>'.PHP_EOL;
 		echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
 		foreach ( $datastructure as $data ) {
 			$list_cols [] = trim($data ['FIELD']);
@@ -96,7 +100,9 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 			echo '<td align="right">' . $data ['ORDINAL_POSITION'] . '</td>';
                         $data ['FIELD'] = trim($data ['FIELD']) ;
 			echo '<td>' . $data ['FIELD'] . '</td>';
-			echo '<td>' . trim($data ['SYSTEM_COLUMN_NAME']) . '</td>';
+			if (!$cet_objet_est_une_vue) {
+				echo '<td>' . trim($data ['SYSTEM_COLUMN_NAME']) . '</td>';
+			}
 			if (isset($data ['COLUMN_TEXT']) && trim($data ['COLUMN_TEXT']) != '') {
 				echo '<td>' . trim($data ['COLUMN_TEXT']) . '</td>';
 			} else {
@@ -175,6 +181,9 @@ BLOC_BTN;
 			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseListCamelColumns" aria-expanded="false" aria-controls="collapseExample">
 			Liste des colonnes (noms longs, alias en "Camel Case") 
 			</button>
+BLOC_HTML;
+			if (!$cet_objet_est_une_vue) {
+			echo <<<BLOC_HTML
 			<br><br>
 			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseListColumnsShorts" aria-expanded="false" aria-controls="collapseExample">
 			Liste des colonnes (noms courts)
@@ -182,6 +191,9 @@ BLOC_BTN;
 			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseListColumnsShorts2" aria-expanded="false" aria-controls="collapseExample">
 			Liste des colonnes (noms courts, alias sur noms longs en "camel case")
 			</button>
+BLOC_HTML;
+			}
+			echo <<<BLOC_HTML
 			{$button_query_sum}
 		</p>
 		<div class="collapse" id="collapseListColumns">

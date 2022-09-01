@@ -298,7 +298,7 @@ BLOC_SQL;
         $cmd = 'DSPFD FILE(' . $schema . '/' . $index . ') TYPE(*ACCPTH) OUTPUT(*OUTFILE) OUTFILE(' .
             $tmp_schema . '/' . $tmp_table . ')';
         $cmd .= ' FILEATR(*ALL) OUTMBR(*FIRST *REPLACE)';
-        $sql = 'SELECT APKEYF AS KEY, APKSEQ AS SENS FROM ';
+        $sql = 'SELECT APKEYF AS KEY, APKSEQ AS SENS, APUNIQ AS UNIQUE_KEY  FROM ';
         $sql .= $tmp_schema . '{SEPARATOR}' . $tmp_table . '';
         return array($cmd, $sql);
     }

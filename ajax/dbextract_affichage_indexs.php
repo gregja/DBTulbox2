@@ -17,7 +17,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 	* dans le cas où on a affaire à une table, affichage de la liste des indexs associés à cette table s'il y en a  
 	*/
 	if (! $cet_objet_est_une_vue) {
-		
+		$recap_indexes = [];
 		echo '<br/><fieldset><legend><h6>Liste des indexs SQL de la table ' . $schema . '/' . $table . ' </h6></legend>' . PHP_EOL;
 		list ( $sql_index_code, $dataindexs ) = GenAlterSQL::reCreateIndexs ( $cnxdb, $schema, $table );
 		if (!is_array($dataindexs) || count ( $dataindexs ) <= 0) {
@@ -39,6 +39,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 				echo '<td>' . $dataindex ['DEP_TYPE_AFF'] . '</td>';
 				echo '<td>' . $dataindex ['COLONS'] . '</td>';
 				echo '</tr>';
+				$recap_indexes []= trim($dataindex ['SYSTEM_INDEX_SCHEMA']) .'.'. trim($dataindex ['SYSTEM_INDEX_NAME']);
 			}
 			echo '</tbody>';
 			echo '</table>';
@@ -63,38 +64,65 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 			if (count ( $indexeslist ) == 1 && trim($indexeslist[0]['FILE']) == '' ) {
 				echo 'Pas d\'indexs DDS définis sur cette table.<br/>';
 			} else {
-				echo 'Nombre d\'indexs dépendants détectés par la commande DSPDBR : ' . count ( $indexeslist ) . '<br/>';
-				echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
-				echo '<thead class="thead-dark">'.PHP_EOL;
-				echo '<tr class="header-row">';
-				echo '<th>Schéma</th><th>Index</th><th>Keys</th>';
-				echo '</tr>'.PHP_EOL ;
-				echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
+				// détection et comptage des indexs qui sont de type DDS
+				$countindexdds = 0;
 				foreach ( $indexeslist as $dataindex ) {
-					list($cmdx, $sqlx) = DB2Tools::extractIndexKeys($dataindex ['FILE'], $dataindex ['LIBRARY']);
-					$cnxdb->executeSysCommand($cmdx);
-					$indexKeys = $cnxdb->selectBlock($sqlx);
-					$tmpkeys = [];
-					foreach($indexKeys as $dtax) {
-						if (trim($dtax['KEY']) != '') {
-							$sens = '';
-							if ($dtax['SENS'] == 'D') $sens = ' (DESC)';
-							$tmpkeys [] = $dtax['KEY'] . $sens;
-						}
+					$checkobj = trim($dataindex ['LIBRARY']) . '.' . trim($dataindex ['FILE']);
+					if (!in_array($checkobj, $recap_indexes)) {
+						$countindexdds++;
 					}
-					if (count($tmpkeys) > 0) {
-						$keys = implode(', ', $tmpkeys);
-					} else {
-						$keys = 'Index de type "surrogate"';
-					}
-					echo '<tr>';
-					echo '<td>' . $dataindex ['LIBRARY'] . '</td>';
-					echo '<td>' . $dataindex ['FILE'] . '</td>';
-					echo '<td>' . $keys . '</td>';
-					echo '</tr>';
 				}
-				echo '</tbody>';
-				echo '</table>';
+				if ($countindexdds == 0) {
+					echo 'Pas d\'indexs DDS définis sur cette table.<br/>';
+				} else {
+					echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
+					echo '<thead class="thead-dark">'.PHP_EOL;
+					echo '<tr class="header-row">';
+					echo '<th>Schéma</th><th>Index</th><th>Clé unique</th><th>Keys</th>';
+					echo '</tr>'.PHP_EOL ;
+					echo '</thead>'.PHP_EOL.'<tbody>'.PHP_EOL;
+					foreach ( $indexeslist as $dataindex ) {
+						$checkobj = trim($dataindex ['LIBRARY']) . '.' . trim($dataindex ['FILE']);
+						if (in_array($checkobj, $recap_indexes)) {
+							// index de type SQL car déjà présent dans le tableau précédent
+							//  donc exclu de ce second tableau
+							continue;
+						}
+						list($cmdx, $sqlx) = DB2Tools::extractIndexKeys($dataindex ['FILE'], $dataindex ['LIBRARY']);
+						$cnxdb->executeSysCommand($cmdx);
+						$indexKeys = $cnxdb->selectBlock($sqlx);
+						$tmpkeys = [];
+						$top_unique_key = false;
+						foreach($indexKeys as $dtax) {
+							if (trim($dtax['KEY']) != '') {
+								$sens = '';
+								if ($dtax['SENS'] == 'D') $sens = ' (DESC)';
+								$tmpkeys [] = $dtax['KEY'] . $sens;
+							}
+							if ($dtax['UNIQUE_KEY'] == 'Y') {
+								$top_unique_key = true;
+							}
+						}
+						if (count($tmpkeys) > 0) {
+							$keys = implode(', ', $tmpkeys);
+						} else {
+							$keys = 'Index de type "surrogate"';
+						}
+						echo '<tr>';
+						echo '<td>' . $dataindex ['LIBRARY'] . '</td>';
+						echo '<td>' . $dataindex ['FILE'] . '</td>';
+						if ($top_unique_key) {
+							echo '<td> YES </td>';
+						} else {
+							echo '<td> NO </td>';
+						}
+						echo '<td>' . $keys . '</td>';
+						echo '</tr>';
+					}
+					echo '</tbody>';
+					echo '</table>';
+					echo 'Nombre d\'indexs de type DDS : ' . $countindexdds . '<br/>';
+				}
 			}
 		}
 
