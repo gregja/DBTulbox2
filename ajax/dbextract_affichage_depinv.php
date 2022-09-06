@@ -3,7 +3,7 @@
 if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET )) {
 	$cnxdb = $this->getDB();
 	$schema = Sanitize::blinderGet ( 'schema');
-	$table = Sanitize::blinderGet ( 'table');
+	$table = Sanitize::blinderGet ( 'table'); 
 
 	$data = $cnxdb->selectOne ( DB2Tools::extractTableInfo (), array ($schema, $table ) );
 	if ($data ['TABLE_TYPE'] == 'V') {
@@ -55,6 +55,39 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		}
 	}
 	
+		/**
+	 * Affichage des MQT utilisant un objet DB2
+	 */
+	function sysViewTabInverse($cnxdb, $system_table_schema, $system_table_name) {
+
+		$data = $cnxdb->selectBlock( DB2Tools::extractSystabdepInverse(), 
+			array ($system_table_schema, $system_table_name ) );
+		if (is_array($data) && count($data)>0) {
+			echo '<div>'.PHP_EOL ;
+			echo '<div class="container">'.PHP_EOL ;
+		
+			echo '<br/><fieldset><legend>Liste des MQT utilisant l\'objet '.$system_table_schema.'/'.$system_table_name.'</legend>'.PHP_EOL;
+			echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
+			echo '<thead class="thead-dark">'.PHP_EOL;
+			echo '<tr><th>MQT name</th><th>MQT schema</th></tr>' . PHP_EOL;
+			echo '</thead>'.PHP_EOL;
+			echo '<tbody>'.PHP_EOL;
+
+			foreach($data as $key=>$value) {
+				$get_params = 'schema='.trim($value ['TABLE_SCHEMA']).'&amp;table='.trim($value ['TABLE_NAME']);
+				echo '<tr>';
+				echo '<td><a href="dbTableDisplay?'.$get_params.'">' . trim($value ['TABLE_NAME']) . '</a></td>'.PHP_EOL;
+				echo '<td>' . trim($value ['TABLE_SCHEMA']) . '</td>'.PHP_EOL;
+				echo '<tr>' .PHP_EOL;
+			}
+			echo '</tbody>'.PHP_EOL;
+			echo '</table>'.PHP_EOL;
+			echo '</fieldset>'.PHP_EOL;
+			echo '</div>'.PHP_EOL ;
+			echo '</div>'.PHP_EOL ;
+		}
+	}
+
 	/**
 	 * Affichage des routines (procédures stockées et UDF/UDTF) utilisant un objet DB2
 	 */
@@ -124,25 +157,33 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		}
 	}
 
+	sysViewTabInverse ($cnxdb, $system_table_schema, $system_table_name);
+
 	// Affichage des vues dépendantes de l'objet DB2
 	sysViewDepInverse($cnxdb, $system_table_schema, $system_table_name);
 	// recherche de dépendances Vues sur les indexs de type DDS (pour prise en compte des indexs surrogate)
-	foreach($dataindexs as $index) {
-		sysViewDepInverse($cnxdb, trim($index['LIBRARY']), trim($index['FILE']));
+	if ($dataindexs) {
+		foreach($dataindexs as $index) {
+			sysViewDepInverse($cnxdb, trim($index['LIBRARY']), trim($index['FILE']));
+		}
 	}
 
 	// Affichage des routines dépendantes de l'objet DB2
 	sysRoutineDepInverse($cnxdb, $system_table_schema, $system_table_name);
 	// recherche de dépendances Routines sur les indexs de type DDS (pour prise en compte des indexs surrogate)
-	foreach($dataindexs as $index) {
-		sysRoutineDepInverse($cnxdb, trim($index['LIBRARY']), trim($index['FILE']));
+	if ($dataindexs) {
+		foreach($dataindexs as $index) {
+			sysRoutineDepInverse($cnxdb, trim($index['LIBRARY']), trim($index['FILE']));
+		}
 	}
 
-	// Affichage des triggers dépendants de l'objet DB2
-	sysTriggerDepInverse($cnxdb, $system_table_schema, $system_table_name);
-	// recherche de dépendances Triggers sur les indexs de type DDS (pour prise en compte des indexs surrogate)
-	foreach($dataindexs as $index) {
-		sysTriggerDepInverse($cnxdb, trim($index['LIBRARY']), trim($index['FILE']));
+	if ($data ['TABLE_TYPE'] != 'V') {
+		// Affichage des triggers dépendants de l'objet DB2
+		sysTriggerDepInverse($cnxdb, $system_table_schema, $system_table_name);
+		// recherche de dépendances Triggers sur les indexs de type DDS (pour prise en compte des indexs surrogate)
+		foreach($dataindexs as $index) {
+			sysTriggerDepInverse($cnxdb, trim($index['LIBRARY']), trim($index['FILE']));
+		}
 	}
 
 }

@@ -5,7 +5,7 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
     $schema = Sanitize::blinderGet('schema');
     $table = Sanitize::blinderGet('table');
     $data = $cnxdb->selectOne(DB2Tools::extractTableInfo(), array($schema, $table));
-    $datatyp = $data ['TABLE_TYPE'];
+    $datatyp = $data ['TABLE_TYPE']; 
 
     if ($datatyp == 'V' || $datatyp == 'M') {
 
@@ -75,8 +75,6 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
         
         echo '<fieldset>' . PHP_EOL;        
         $get_params = "schema=$schema&amp;table=$table" ;
-        echo '<br>'.PHP_EOL;
-        echo '<a href="dbextract_affichage_depview2.php?'.$get_params.'" target="_blank">Arbre des dépendances</a>'.PHP_EOL ;
         echo '<br><br>'.PHP_EOL;
         echo '</fieldset>' . PHP_EOL;
         

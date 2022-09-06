@@ -1,4 +1,5 @@
 <?php
+
 interface intDB2Tools {
 
     public static function convertirCaracteresAccentues($chaine);
@@ -252,6 +253,7 @@ BLOC_SQL;
         $liste['T'] = 'Tables SQL';
         $liste['P'] = 'Fichiers physiques';
         $liste['V'] = 'Vues';
+        $liste['M'] = 'Materialized Query Tables (MQT)';
         return $liste;
     }
 
@@ -628,6 +630,19 @@ BLOC_SQL;
         $sql = <<<BLOC_SQL
 SELECT VIEW_NAME, VIEW_OWNER, VIEW_SCHEMA
 FROM {$bib_sys}{SEPARATOR}SYSVIEWDEP
+WHERE OBJECT_SCHEMA = ? AND OBJECT_NAME = ? 
+BLOC_SQL;
+
+        return $sql;
+    }
+
+    public static function extractSystabdepInverse() {
+
+        $bib_sys = self::BIB_SYS;
+
+        $sql = <<<BLOC_SQL
+SELECT TABLE_SCHEMA, TABLE_NAME
+FROM {$bib_sys}{SEPARATOR}SYSTABDEP
 WHERE OBJECT_SCHEMA = ? AND OBJECT_NAME = ? 
 BLOC_SQL;
 
