@@ -3,7 +3,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'routine', $_GET 
 	$cnxdb = $this->getDB();	
 	$schema = Sanitize::blinderGet ( 'schema');
 	$routine = Sanitize::blinderGet ( 'routine');
-	$type = Sanitize::blinderGet ( 'type'); 
+	$type = Sanitize::blinderGet ( 'type');
 
     if ($type == 'PROCEDURE') {
         $type_objet = 'procédure stockée';

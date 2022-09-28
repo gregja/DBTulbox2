@@ -5,7 +5,7 @@ if (array_key_exists('schema', $_GET) && array_key_exists('table', $_GET)) {
     $schema = Sanitize::blinderGet('schema');
     $table = Sanitize::blinderGet('table');
     $data = $cnxdb->selectOne(DB2Tools::extractTableInfo(), array($schema, $table));
-    $datatyp = $data ['TABLE_TYPE']; 
+    $datatyp = $data ['TABLE_TYPE'];
 
     if ($datatyp == 'V' || $datatyp == 'M') {
 

@@ -138,7 +138,7 @@ if (array_key_exists ( 'nom_base', $params ) && array_key_exists ( 'nom_routine'
                 echo '<table class="table table-striped table-sm table-bordered" >'.PHP_EOL;
                 echo '<thead class="thead-dark">'.PHP_EOL;    
 				echo '<tr>';
-				echo '<th>Schéma</th><th>Routine</th><th>Type</th><th>Body</th><th>Déterministique</th><th align="right">Nb.parms.</th><th>Créée par</th><th align="center">Date création</th>';
+				echo '<th>Schéma</th><th>Routine</th><th>Type</th><th>Body</th><th>Déterministe</th><th align="right">Nb.parms.</th><th>Créée par</th><th align="center">Date création</th>';
 				if ($ref_croisee) {
 					echo '<th>Bib.Proc.</th><th>Nom Proc.DB2.</th>';
 				}

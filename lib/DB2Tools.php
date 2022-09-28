@@ -1,124 +1,5 @@
 <?php
-
-interface intDB2Tools {
-
-    public static function convertirCaracteresAccentues($chaine);
-
-    public static function extractDb2ObjectsFromLib($table_name_only = false, $table_name_include_short_name = false, $ref_croisee = false, $creator=false, $sql_include='');
-
-    public static function getSchemas($search = '', $like = false);
-
-    public static function getTypeObjetsDb2($tous = true);
-
-    public static function extractIbmiObjectsFromLib($library, $tmp_table, $tmp_schema = '');
-
-    public static function extractDspfdMbrlist($table, $schema, $tmp_table = '', $tmp_schema = '');
-
-    public static function extractDspDbr($table, $schema, $tmp_table = '', $tmp_schema = '');
-    
-    public static function extractIndexKeys($index, $schema, $tmp_table = '', $tmp_schema = ''); 
-
-    public static function findTableFromSsystemName();
-
-    public static function checkIndexFromSystemName();
-
-    public static function parseIbmiObjectsFromLib($tmp_table, $credat_comp = true, $typ_object = '', $typ_attrib = '');
-
-    public static function compareStrings($chaine1, $chaine2, $troncat = false);
-
-    public static function retrieveUserProfile($user = '', $tmp_table = '', $tmp_schema = '');
-
-    public static function getIbmiProfilesWithFilters($filters = array(), $tmp_table = '', $tmp_schema = '');
-
-    public static function getIbmiJobdprfusers($tmp_table = '', $tmp_schema = '');
-
-    public static function extractTableStruct($data_from_system_table = false, $columns_only = false);
-
-    public static function extractTableInfo($data_from_system_table = false) ;
-
-    public static function extractDependanceInverse();
-
-    public static function extractSysindexs($data_from_system_table = false);
-
-    public static function extractSysindexkeys($data_from_system_table = false, $index_sql = 'YES');
-
-    public static function extractAllsysviews($view_name = '', $data_from_system_table = false, $ref_croisee = false, $param_optionnels=array());
-
-    public static function extractSysviewdep();
-
-    public static function extractSystabledep();
-    
-    public static function extractSysviewdepInverse();
-
-    public static function extractAllsysroutines($routine_name = '', $data_from_system_table = false, $ref_croisee = false);
-
-    public static function extractSysroutine();
-
-    public static function extractSysroutinedep();
-
-    public static function extractSysroutinedepInverse();
-
-    public static function getTablesByColumn($nom_colonne, $nom_schema, $nom_table);
-
-    public static function extractTableStat($nom_table, $nom_schema);
-
-    /**
-     *
-     * L'objectif de cette méthode est de générer une requête SQL qui permettra d'obtenir
-     * les valeurs mini, maxi et la longueur maxi de chaque colonne d'une table
-     * Le résultat de cette requête pourra être transmis au 2ème paramètre de la méthode analyseTableStruct()
-     * @param string $schema
-     * @param string $table
-     * @param array $colonnes  => tableau contenant la liste des colonnes de la table
-     */
-    public static function extractColumnsMinmax($schema, $table, $colonnes);
-
-    /**
-     *
-     * L'objectif de cette méthode est de produire un tableau à peu près équivalent à celui
-     * que l'on peut obtenir sous MySQL avec la requête suivante :
-     *       SELECT * FROM `table` PROCEDURE ANALYSE ( ) ;
-     * Cette méthode a besoin de la structure de la table
-     * @param array $datastructure   => données fournies par la requête générée par la méthode extractTableStruct()
-     * @param array $tabminmax       => données fournies par la requête générée par la méthode extractColumnsMinmax()
-     */
-    public static function analyseTableStruct($datastructure, $tabminmax);
-
-    public static function getListeTables($recherche_base, $recherche_table, $recherche_varchar, $type_objet, $ref_croisee);
-
-    public static function getRefCroiseesSysroutines($table_name_from_a='');
-
-    public static function genAltertables($zone_util = false, $prefix_tables = '', $prefix_procs = '');
-
-    public static function getSqlStates();
-
-    public static function getSqlVerbs();
-
-    public static function changeJobSortSequence();
-    
-    /**
-     * Récupération de la version d'OS IBMi (exemple : V7R1, V7R2, ...)
-     */
-    public static function getOsVersion () ;
-
-    /**
-     * Génère une requête permettant de vérifier l'existence d'un objet DB2
-     * en fonction du type transmis en paramètre (TABLE, VIEW, INDEX, ROUTINE)
-     * @param string $object_type
-     */
-    public static function checkObjectExists($object_type) ;
-    
-    /**
-     * Fonction utilisable uniquement à partir de la V7R1
-     * @param array (renvoie un tableau contenant la bibliothèque et le
-     *               nom de la procédure système de regénération de
-     *               source SQL)
-     */
-    public static function procGenerateSQL () ;
-
-}
-
-abstract class DB2Tools implements intDB2Tools {
+abstract class DB2Tools {
 
     const BIB_SYS = 'QSYS2';
 
@@ -196,19 +77,26 @@ abstract class DB2Tools implements intDB2Tools {
         if ($sql_include != '') {
             $sql_include = ' AND A.DBXLFI IN ('.$sql_include.') ' ;
         }
+
+        if (defined('SPECIFIC_VIEWS') && SPECIFIC_VIEWS == true && defined('SPECIFIC_LIB_VIEWS')) {
+            $dbobject = SPECIFIC_LIB_VIEWS."{SEPARATOR}VUE_QADBXREF";
+        } else {
+            $dbobject = "QSYS{SEPARATOR}QADBXREF";
+        }
+
         if ($table_name_only === true) {
             // renvoi des seuls noms d'objets, incluant éventuellement les noms courts
             if ($table_name_include_short_name === true) {
                 $sql = <<<BLOC_SQL
 SELECT distinct A.DBXLFI, A.DBXFIL
-FROM QSYS{SEPARATOR}QADBXREF A {$ref_croisee_sql}
+FROM {$dbobject} A {$ref_croisee_sql}
 WHERE A.DBXLIB = ? {$sql_include}
 ORDER BY A.DBXLFI         
 BLOC_SQL;
             } else {
                 $sql = <<<BLOC_SQL
 SELECT distinct A.DBXLFI 
-FROM QSYS{SEPARATOR}QADBXREF A {$ref_croisee_sql}
+FROM {$dbobject} A {$ref_croisee_sql}
 WHERE A.DBXLIB = ? {$sql_include}
 ORDER BY A.DBXLFI         
 BLOC_SQL;
@@ -222,17 +110,22 @@ BLOC_SQL;
             }
             $sql = <<<BLOC_SQL
 SELECT distinct A.DBXLFI, A.DBXFIL, A.DBXATR, A.DBXTYP, A.DBXNFL, A.DBXNKF, A.DBXRDL{$definer} 
-FROM QSYS{SEPARATOR}QADBXREF A {$ref_croisee_sql}
+FROM {$dbobject} A {$ref_croisee_sql}
 WHERE A.DBXLIB = ? AND A.DBXATR <> 'IX' {$sql_include}
 ORDER BY A.DBXLFI         
 BLOC_SQL;
         }
         return $sql;
     }
-
+/*
     public static function getSchemas($search = '', $like = false) {
-        // $sql = 'SELECT SCHEMA_NAME FROM QSYS2{SEPARATOR}SYSSCHEMAS ';
-        $sql = 'SELECT DISTINCT DBXLIB FROM QSYS{SEPARATOR}QADBXREF ';
+        if (defined('SPECIFIC_VIEWS') && SPECIFIC_VIEWS == true && defined('SPECIFIC_LIB_VIEWS')) {
+            $dbobject = SPECIFIC_LIB_VIEWS."{SEPARATOR}VUE_QADBXREF";
+        } else {
+            $dbobject = "QSYS{SEPARATOR}QADBXREF";
+        }
+
+        $sql = 'SELECT DISTINCT DBXLIB FROM '.$dbobject;
         $search = trim($search);
         if ($search != '') {
             $sql .= ' WHERE DBXLIB ';
@@ -244,7 +137,7 @@ BLOC_SQL;
         }
         return $sql;
     }
-
+*/
     public static function getTypeObjetsDb2($tous = true) {
         $liste = array();
         if ($tous === true) {
@@ -536,10 +429,13 @@ BLOC_SQL;
         return $sql;
     }
     
-    public static function extractDependanceInverse() {
-
-        $sql = 'SELECT DBFFIL, DBFLIB, DBFTDP, DBFRDP FROM QSYS{SEPARATOR}QADBFDEP WHERE DBFLDP = ? AND DBFFDP = ? ';
-
+    public static function extractDependanceInverse($use_view=false, $view_lib="") {
+        if ($use_view && $view_lib != "" ) {
+            $dbobject = $view_lib."{SEPARATOR}VUE_QADBFDEP";
+        } else {
+            $dbobject = "QSYS{SEPARATOR}QADBFDEP";
+        }
+        $sql = "SELECT DBFFIL, DBFLIB, DBFTDP, DBFRDP FROM {$dbobject} WHERE DBFLDP = ? AND DBFFDP = ? ";
         return $sql;
     }
 
@@ -572,7 +468,12 @@ BLOC_SQL;
 
             $sql = 'SELECT SUBSTR(COLUMN_NAME, 1, 30) AS COLUMN_NAME, ORDERING FROM ' . self::BIB_SYS . '{SEPARATOR}SYSKEYS WHERE ' . $from_table . ' ORDER BY ORDINAL_POSITION ';
         } else {
-            $sql = 'SELECT DBKFLD AS COLUMN_NAME, DBKORD AS ORDERING FROM QSYS{SEPARATOR}QADBKFLD WHERE DBKLIB = ? and DBKFIL = ? ORDER BY DBKPOS ';
+            if (defined('SPECIFIC_VIEWS') && SPECIFIC_VIEWS == true && defined('SPECIFIC_LIB_VIEWS')) {
+                $dbobject = SPECIFIC_LIB_VIEWS."{SEPARATOR}VUE_QADBKFLD";
+            } else {
+                $dbobject = "QSYS{SEPARATOR}QADBKFLD";
+            }
+            $sql = "SELECT DBKFLD AS COLUMN_NAME, DBKORD AS ORDERING FROM {$dbobject} WHERE DBKLIB = ? and DBKFIL = ? ORDER BY DBKPOS ";
         }
         return $sql;
     }
@@ -686,19 +587,22 @@ BLOC_SQL;
         return $sql;
     }
 
-    public static function extractAllsysroutines($routine_name = '', $data_from_system_table = false, $ref_croisee = false) {
+    public static function extractAllsysroutines($schema_name, $routine_name = '', $data_from_system_table = false, $ref_croisee = false) {
         $bib_sys = self::BIB_SYS;
-        if ($data_from_system_table) {
-            $from_table = ' A.SPECIFIC_SCHEMA = ?';
-        } else {
-            $from_table = ' A.ROUTINE_SCHEMA = ?';
+        $wheres = array();
+        if ($schema_name != '') {
+            if ($data_from_system_table) {
+                $wheres [] = 'A.SPECIFIC_SCHEMA = ?';
+            } else {
+                $wheres [] = 'A.ROUTINE_SCHEMA = ?';
+            }
         }
         $routine_name = trim($routine_name);
         if ($routine_name != '') {
             if (strpos($routine_name, '%') !== false) {
-                $from_table .= ' AND A.ROUTINE_NAME LIKE ?';
+                $wheres [] = 'A.ROUTINE_NAME LIKE ?';
             } else {
-                $from_table .= ' AND A.ROUTINE_NAME = ?';
+                $wheres [] = 'A.ROUTINE_NAME = ?';
             }
         }
         if ($ref_croisee === true) {
@@ -710,10 +614,16 @@ BLOC_SQL;
             $ref_croisee_colons = '';
         }
 
+        if (count($wheres) > 0) {
+            $criteres_sql = ' WHERE ' . implode(' AND ', $wheres);
+        } else {
+            $criteres_sql = '';
+        }
+
         $sql = <<<BLOC_SQL
 SELECT A.* {$ref_croisee_colons}
 FROM {$bib_sys}{SEPARATOR}SYSROUTINE A {$ref_croisee_sql}
-WHERE {$from_table}
+{$criteres_sql}
 BLOC_SQL;
 
         return $sql;
@@ -781,6 +691,15 @@ BLOC_SQL;
         return $sql;
     }
 
+    /**
+     *
+     * L'objectif de cette méthode est de générer une requête SQL qui permettra d'obtenir
+     * les valeurs mini, maxi et la longueur maxi de chaque colonne d'une table
+     * Le résultat de cette requête pourra être transmis au 2ème paramètre de la méthode analyseTableStruct()
+     * @param string $schema
+     * @param string $table
+     * @param array $colonnes  => tableau contenant la liste des colonnes de la table
+     */
     public static function extractColumnsMinmax($schema, $table, $colonnes) {
 
         $sql_colonne = array();
@@ -797,6 +716,15 @@ BLOC_SQL;
         return $sql;
     }
 
+    /**
+     *
+     * L'objectif de cette méthode est de produire un tableau à peu près équivalent à celui
+     * que l'on peut obtenir sous MySQL avec la requête suivante :
+     *       SELECT * FROM `table` PROCEDURE ANALYSE ( ) ;
+     * Cette méthode a besoin de la structure de la table
+     * @param array $datastructure   => données fournies par la requête générée par la méthode extractTableStruct()
+     * @param array $tabminmax       => données fournies par la requête générée par la méthode extractColumnsMinmax()
+     */
     public static function analyseTableStruct($datastructure, $tabminmax) {
         $tab_optimize = array();
         foreach ($datastructure as $data) {
@@ -1201,10 +1129,18 @@ BLOC_SQL;
         return $sys_cmd;
     }
 
+    /**
+     * Récupération de la version d'OS IBMi (exemple : V7R1, V7R2, ...)
+     */
     public static function getOsVersion () {
         return "SELECT 'V' concat OS_VERSION concat 'R' concat OS_RELEASE as version_os FROM SYSIBMADM.ENV_SYS_INFO" ;
     }
-            
+
+    /**
+     * Génère une requête permettant de vérifier l'existence d'un objet DB2
+     * en fonction du type transmis en paramètre (TABLE, VIEW, INDEX, ROUTINE)
+     * @param string $object_type
+     */
     public static function checkObjectExists($object_type) {
         $bib_sys = self::BIB_SYS;
         $object_type = trim(strtoupper($object_type)) ;
@@ -1246,6 +1182,12 @@ BLOC_SQL;
 
     }
     
+    /**
+     * Fonction utilisable uniquement à partir de la V7R1
+     * @param array (renvoie un tableau contenant la bibliothèque et le
+     *               nom de la procédure système de regénération de
+     *               source SQL)
+     */    
     public static function procGenerateSQL () {
         return array('QSYS2' , 'GENERATE_SQL') ; 
     }
@@ -1259,7 +1201,6 @@ BLOC_SQL;
           AND SYSTEM_TABLE_SCHEMA = ?
 SQL;
     }
-
 
     public static function getTableTriggers() {
         $bib_sys = self::BIB_SYS;

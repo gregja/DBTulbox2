@@ -3,7 +3,7 @@
 if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET )) {
 	$cnxdb = $this->getDB();
 	$schema = Sanitize::blinderGet ( 'schema');
-	$table = Sanitize::blinderGet ( 'table'); 
+	$table = Sanitize::blinderGet ( 'table');
 
 	$data = $cnxdb->selectOne ( DB2Tools::extractTableInfo (), array ($schema, $table ) );
 	if ($data ['TABLE_TYPE'] == 'V') {
@@ -55,7 +55,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		}
 	}
 	
-		/**
+	/**
 	 * Affichage des MQT utilisant un objet DB2
 	 */
 	function sysViewTabInverse($cnxdb, $system_table_schema, $system_table_name) {
@@ -98,7 +98,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 			echo '<div>'.PHP_EOL ;
 			echo '<div class="container">'.PHP_EOL ;
 			
-			echo '<br/><fieldset><legend>Liste des routines utilisant l\'objet '. $system_table_schema . '.' .
+			echo '<br/><fieldset><legend>Liste des Routines utilisant l\'objet '. $system_table_schema . '/' .
 				$system_table_name.'</legend>'.PHP_EOL;
 			echo 'Attention : cette liste est théorique, car la recherche est effectuée sur le nom de l\'objet considéré, sans la bibliothèque,<br/>';
 			echo 'cette dernière n\'étant pas toujours "qualifiée" dans les routines (procédures et fonctions) référencées (Object schema = *LIBL).<br/><br/>'.PHP_EOL ; 

@@ -53,24 +53,60 @@ Warning : only the first item of the array $liste_servers is mandatory. This arr
 
 The IBM i user profile to be used with this application must have read privileges on the main system tables of the QSYS2 library (SYSTABLES, SYSCOLUMNS, SYSVIEWS, etc.), but also on three tables of the QSYS library, which are:
 
-
 - QSYS/QADBFDEP 
 - QSYS/QADBKFLD
 - QSYS/QADBXREF
 
-The first two tables are especially useful for retrieving certain metadata related to "surrogate" files. The third is necessary to allow the library comparison option to work properly.
+The first two tables are especially useful for retrieving metadatas related to "surrogate" files. The third is necessary to allow the library comparison option to work properly.
 
+If you don't want to increase the rights of the IBM i profile, you can create some DB2 functions and parametrize the application to override the 3 QSYS tables, by 3 views, placed in the library of your choice. To do that, add in the "config_xxx.php" file the lines below :
+
+```php
+// Ajout paramétrage pour forcer la lecture des tables QADBFDEP, QADBKFLD, QADBXREF de QSYS
+//  au travers de vues (dans le cas où le profil IBM i aurait des droits restreints sur QSYS)
+define ( 'SPECIFIC_VIEWS', true); 
+define ( 'SPECIFIC_LIB_VIEWS' , 'YOURVIEWLIB'); // set the value with your own library
+```
+
+... then create the views below :
+
+```sql
+CREATE OR REPLACE VIEW YOURVIEWLIB.VUE_QADBFDEP AS 
+SELECT DBFFIL, DBFLIB, DBFTDP, DBFRDP, DBFLDP, DBFFDP FROM QSYS.QADBFDEP;
+
+CREATE OR REPLACE VIEW YOURVIEWLIB.VUE_QADBKFLD AS 
+SELECT DBKFLD, DBKORD DBKLIB, DBKFIL, DBKPOS FROM QSYS.QADBKFLD;
+
+CREATE OR REPLACE VIEW YOURVIEWLIB.VUE_QADBXREF AS 
+SELECT DBXLFI, DBXFIL, DBXATR, DBXTYP, DBXNFL, DBXNKF, DBXRDL, DBXDEFINER, DBXLIB
+FROM QSYS.QADBXREF;
+```
+
+... and add the SELECT right to the views, for your IBM i profile :
+
+```sql
+GRANT SELECT  
+ON YOURVIEWLIB.VUE_QADBFDEP  
+TO YOURPROFILE WITH GRANT OPTION;
+
+GRANT SELECT  
+ON YOURVIEWLIB.VUE_QADBKFLD  
+TO YOURPROFILE WITH GRANT OPTION;
+
+GRANT SELECT  
+ON YOURVIEWLIB.VUE_QADBXREF  
+TO YOURPROFILE WITH GRANT OPTION;
+```
 
 ## TODO LIST 
 
 Shortlist of improvements I want to add :
- * replace, in macaronDB, the current pagination function with the new LIMIT clause of DB2
- * finalize the 2 options for Databases comparisons
+ * finalize the second option for Databases comparison (more detailed)
  * implement CSV exports (code commented for the moment, because I need to adapt Bones for that feature)
+ * replace, in macaronDB, the current pagination function with the new LIMIT clause of DB2
+ * searching on tables : add "description column" filter
+ * display table : if type_table = "A" (for Alias), use systables columns BASE_TABLE_NAME & BASE_TABLE_SCHEMA to find the target table
  * and much more... :)
- * searching on tables : add "A" (alias) and "M" (MQT) filters
- *   ....              : add "description column" filter
- * display table : if type_table = "A", use systables columns BASE_TABLE_NAME & BASE_TABLE_SCHEMA to find the target table
 
  
 

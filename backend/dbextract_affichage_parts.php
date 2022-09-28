@@ -32,7 +32,11 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 		} else {	
 			if ($cet_objet_est_un_index) {
 				echo '<legend><h6>Description de l\'index : '.$schema.'/'.$table . '</h6></legend>';
-				$sql_dep = DB2Tools::extractDependanceInverse();
+				if (defined('SPECIFIC_VIEWS') && SPECIFIC_VIEWS == true && defined('SPECIFIC_LIB_VIEWS')) {
+					$sql_dep = DB2Tools::extractDependanceInverse(SPECIFIC_VIEWS, SPECIFIC_LIB_VIEWS);
+				} else {
+					$sql_dep = DB2Tools::extractDependanceInverse();
+				}
 				$data_dep = $cnxdb->selectOne($sql_dep, array ($system_schema, $system_table ) ) ;
 				echo 'Table sous-jacente : ';
 				if ($data_dep) {
@@ -48,7 +52,7 @@ if (array_key_exists ( 'schema', $_GET ) && array_key_exists ( 'table', $_GET ))
 						echo ' => Nom long : donnée indisponible';
 					}
 				} else {
-					echo 'donnée indisponible (problème de droits sur QADBFDEP)';
+					echo 'donnée indisponible (problème de droits sur QADBFDEP)';		
 				}
 				
 				echo '<br>'.PHP_EOL;
